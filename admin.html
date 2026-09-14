@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Na Vibe — Gestão</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Na Vibe Gestão">
+<link rel="apple-touch-icon" href="admin-icon-180.png">
+<style>
+:root{--green:#79d51a;--black:#111;--paper:#f4f4f1;--muted:#777;--red:#c62828;--yellow:#d68a00}
+*{box-sizing:border-box}
+html{background:#111}
+body{margin:0;background:var(--paper);color:#111;font-family:Arial,Helvetica,sans-serif;min-height:100vh;padding-bottom:92px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{background:#111;color:#fff;padding:calc(16px + env(safe-area-inset-top)) 14px 14px;position:sticky;top:0;z-index:30;box-shadow:0 3px 18px #0004}
+.head{max-width:880px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{font-size:28px;font-weight:900;font-style:italic}.logo b{color:var(--green)}
+.role{font-size:11px;font-weight:900;border:1px solid #ffffff25;border-radius:999px;padding:7px 10px;background:#ffffff10}
+.wrap{max-width:880px;margin:auto;padding:11px}
+.tabs{display:flex;gap:7px;overflow:auto;scrollbar-width:none;position:sticky;top:69px;z-index:20;background:var(--paper);padding:5px 0 10px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;border:1px solid #ddd;background:#fff;border-radius:999px;padding:10px 13px;font-weight:900;font-size:12px}
+.tab.active{background:#111;color:#fff;border-color:#111}
+.view{display:none}.view.active{display:block}
+.statusbar{display:flex;gap:7px;overflow:auto;padding:1px 0 9px;scrollbar-width:none}
+.status{flex:0 0 auto;background:#fff;border:1px solid #ddd;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#aaa;margin-right:5px}.dot.on{background:#4cb400}.dot.off{background:#d33131}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.card{background:#fff;border-radius:17px;padding:14px;box-shadow:0 3px 15px #0000000b;min-width:0}
+.card.total{grid-column:1/-1;background:#111;color:#fff}
+.label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:#777}
+.total .label{color:#bbb}
+.value{font-size:25px;font-weight:900;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.total .value{font-size:36px;color:var(--green)}
+.payments{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.pay{background:#fff;border:1px solid #e7e7e1;border-radius:14px;padding:12px}.pay span{display:block;font-size:10px;font-weight:900;text-transform:uppercase;color:#777}.pay b{display:block;font-size:17px;margin-top:4px}
+.panel{background:#fff;border-radius:17px;padding:14px;margin-top:9px;box-shadow:0 3px 15px #0000000b}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:10px}.panel h2{font-size:18px;margin:0}
+.empty{padding:25px 5px;text-align:center;color:#777}
+.order{border-top:1px solid #eee;padding:12px 0}.order:first-child{border-top:0}
+.order-top{display:flex;justify-content:space-between;gap:10px}.order-num,.order-total{font-weight:900;font-size:17px}.order-total{white-space:nowrap}
+.meta{color:#777;font-size:12px;line-height:1.4;margin-top:4px}.reprint{border:0;background:#111;color:#fff;border-radius:8px;padding:8px 9px;font-weight:900;font-size:11px;margin-top:8px}
+
+.stock-summary,.recipe-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.mini{background:#fff;border:1px solid #e7e7e1;border-radius:14px;padding:12px}.mini span{display:block;color:#777;font-size:10px;font-weight:900;text-transform:uppercase}.mini b{display:block;font-size:20px;margin-top:4px}
+.tools{display:flex;gap:7px;margin:10px 0}.tools input{flex:1;min-width:0;border:1px solid #ddd;border-radius:10px;padding:11px}.newbtn{border:0;background:var(--green);border-radius:10px;padding:11px;font-weight:900;white-space:nowrap}
+.group{font-size:11px;color:#777;font-weight:900;text-transform:uppercase;margin:16px 3px 6px}
+.stock-item,.recipe-item{background:#fff;border:1px solid #e7e7e1;border-radius:15px;padding:13px;margin-bottom:8px}
+.stock-item.low{background:#fffaf0;border-color:#efc36c}.stock-item.out{background:#fff3f3;border-color:#e5a5a5}
+.topline{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.name{font-weight:900;font-size:15px}.qty{font-size:19px;font-weight:900;white-space:nowrap}
+.small{font-size:12px;color:#777;line-height:1.45;margin-top:4px}.cost{font-size:12px;color:#444;margin-top:4px}
+.badge{display:inline-block;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:900;margin-top:6px}.badge.ok{background:#e9f7dc;color:#376508}.badge.low{background:#fff0cc;color:#865700}.badge.out{background:#ffdfdf;color:#951b1b}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.actions button{border:0;border-radius:8px;padding:8px 9px;font-size:11px;font-weight:900}.add{background:var(--green)}.adjust{background:#eee}.edit{background:#111;color:#fff}
+.help{font-size:12px;line-height:1.45;color:#777;background:#f6f6f3;border-radius:10px;padding:10px;margin-bottom:10px}
+.recipe-item button{border:0;background:#111;color:#fff;border-radius:8px;padding:8px 9px;font-weight:900;font-size:11px;margin-top:9px}
+.recipe-row{border:1px solid #e6e6e1;border-radius:12px;padding:10px;margin:8px 0;background:#fafafa}.recipe-grid{display:grid;grid-template-columns:1fr .55fr .55fr;gap:7px;align-items:end}.recipe-row select,.recipe-row input{width:100%;border:1px solid #ddd;border-radius:9px;padding:10px;margin-top:5px;background:#fff}.remove{border:0;background:#ffe0e0;color:#931818;border-radius:8px;padding:7px 9px;font-weight:900;margin-top:7px}.addcomponent{width:100%;border:1px dashed #aaa;background:#fff;border-radius:10px;padding:11px;font-weight:900;margin-top:8px}
+
+.modal{display:none;position:fixed;inset:0;background:#000a;z-index:90;padding:12px;align-items:flex-end;justify-content:center}.modal.open{display:flex}
+.sheet{background:#fff;width:100%;max-width:660px;max-height:92vh;overflow:auto;border-radius:22px 22px 16px 16px;padding:16px}.sheet h2{margin:3px 0 13px}.sheet label{display:block;font-weight:900;font-size:13px;margin-top:9px}.sheet input,.sheet select{width:100%;border:1px solid #ddd;border-radius:10px;padding:12px;margin-top:5px;background:#fff}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.sheet-actions button{border:0;border-radius:10px;padding:12px;font-weight:900}.save{background:var(--green)}.cancel{background:#eee}.delete{width:100%;border:0;background:#ffe2e2;color:#941919;border-radius:10px;padding:11px;font-weight:900;margin-top:8px}
+
+.login{position:fixed;inset:0;background:#111;color:#fff;z-index:100;display:flex;align-items:center;justify-content:center;padding:22px}.loginbox{width:100%;max-width:380px;text-align:center}.loginlogo{font-size:38px;font-weight:900;font-style:italic}.loginlogo b{color:var(--green)}.login p{color:#bbb;line-height:1.4}.login input{width:100%;padding:14px;border:1px solid #333;border-radius:12px;background:#191919;color:#fff;text-align:center;font-size:22px;letter-spacing:6px;margin:10px 0}.login button{width:100%;border:0;background:var(--green);border-radius:12px;padding:14px;font-weight:900;font-size:16px}.err{min-height:20px;color:#ff8787;font-size:13px;margin-top:9px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#111;padding:9px 11px calc(9px + env(safe-area-inset-bottom));z-index:40}.bottomin{max-width:880px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}.bottom button{border:0;border-radius:10px;padding:10px;font-weight:900}.logout{background:#292929;color:#fff}.reload{background:var(--green)}
+.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%) translateY(10px);opacity:0;background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:900;transition:.2s;z-index:95;white-space:nowrap;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.stock-alert{background:#fff;border:1px solid #e7e7e1;border-radius:15px;padding:13px;margin-top:9px}
+.stock-alert.has-alert{border-color:#efc36c;background:#fffaf0}
+.stock-alert-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:900}
+.stock-alert-title .count{font-size:12px;border-radius:999px;padding:5px 8px;background:#eee}
+.level-list{display:grid;gap:9px;margin-top:11px}
+.level-row{border:1px solid #e7e7e1;border-radius:13px;padding:11px;background:#fff}
+.level-row.low{border-color:#efc36c;background:#fffaf0}
+.level-row.out{border-color:#e5a5a5;background:#fff3f3}
+.level-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.level-name{font-weight:900;font-size:14px;min-width:0}
+.level-number{font-weight:900;font-size:15px;white-space:nowrap}
+.level-sub{font-size:11px;color:#777;margin-top:3px;line-height:1.35}
+.level-track{height:12px;border-radius:999px;background:#ecece7;overflow:hidden;margin-top:8px}
+.level-fill{height:100%;border-radius:999px;background:#61a92e;transition:width .25s ease}
+.level-row.low .level-fill{background:#e3a324}
+.level-row.out .level-fill{background:#cf3c3c}
+.level-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}
+.level-state{font-size:10px;font-weight:900;border-radius:999px;padding:5px 7px}
+.level-state.ok{background:#e9f7dc;color:#376508}.level-state.low{background:#fff0cc;color:#865700}.level-state.out{background:#ffdfdf;color:#951b1b}
+.quick-entry{border:0;border-radius:8px;padding:7px 9px;background:#111;color:#fff;font-size:10px;font-weight:900}
+.stock-filter{display:flex;gap:6px;overflow:auto;margin:10px 0;scrollbar-width:none}
+.stock-filter button{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 10px;font-size:11px;font-weight:900;white-space:nowrap}
+.stock-filter button.active{background:#111;color:#fff;border-color:#111}
+.stock-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#666;margin-top:8px}
+.stock-legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.stock-legend .lg-ok::before{background:#61a92e}.stock-legend .lg-low::before{background:#e3a324}.stock-legend .lg-out::before{background:#cf3c3c}
+
+
+.data-table-wrap{overflow:auto;border:1px solid #e7e7e1;border-radius:14px;background:#fff}
+.data-table{width:100%;border-collapse:collapse;min-width:820px}
+.data-table th{position:sticky;top:0;background:#f4f4f1;text-align:left;padding:10px;font-size:10px;text-transform:uppercase;color:#666;border-bottom:1px solid #ddd;z-index:1}
+.data-table td{padding:10px;border-bottom:1px solid #eee;font-size:12px;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:0}.data-table tr.row-low{background:#fffaf0}.data-table tr.row-out{background:#fff2f2}
+.status-pill{display:inline-block;padding:5px 7px;border-radius:999px;font-size:10px;font-weight:900}
+.status-pill.ok{background:#e8f6da;color:#39660b}.status-pill.low{background:#fff0c9;color:#865900}.status-pill.out{background:#ffdede;color:#981919}
+.table-actions{display:flex;gap:5px;flex-wrap:wrap}.table-actions button{border:0;border-radius:8px;padding:7px 8px;font-size:10px;font-weight:900}
+.table-actions .a1{background:var(--green)}.table-actions .a2{background:#eee}.table-actions .a3{background:#111;color:#fff}
+.cost-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cost-card{background:#fff;border:1px solid #e7e7e1;border-radius:15px;padding:13px}
+.cost-card span{display:block;font-size:10px;text-transform:uppercase;color:#777;font-weight:900}.cost-card b{display:block;font-size:22px;margin-top:5px}
+.cost-card.profit{background:#111;color:#fff}.cost-card.profit span{color:#aaa}.cost-card.profit b{color:var(--green)}
+.margin-track{height:9px;background:#ecece7;border-radius:999px;overflow:hidden;min-width:110px}.margin-fill{height:100%;background:#61a92e;border-radius:999px}
+.margin-fill.mid{background:#e3a324}.margin-fill.low{background:#cf3c3c}.profit-chart{display:grid;gap:9px}
+.profit-row{display:grid;grid-template-columns:minmax(120px,1.1fr) 2fr auto;gap:8px;align-items:center}.profit-row .pname{font-size:12px;font-weight:900}.profit-row .pval{font-size:11px;font-weight:900;white-space:nowrap}
+.purchase-example{background:#f6f6f3;border-radius:12px;padding:10px;font-size:12px;line-height:1.45;margin-top:8px}
+@media(min-width:720px){.cost-summary{grid-template-columns:repeat(4,1fr)}}
+
+@media(min-width:720px){.cards{grid-template-columns:repeat(3,1fr)}.card.total{grid-column:auto}.payments{grid-template-columns:repeat(5,1fr)}.stock-summary{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="logo"><b>NA</b> VIBE</div><div class="role" id="roleBadge">GESTÃO</div></div></header>
+
+<main class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="resumo" data-admin-only>RESUMO</button>
+    <button class="tab" data-tab="estoque">ESTOQUE</button>
+    <button class="tab" data-tab="receitas" data-admin-only>RECEITAS</button>
+    <button class="tab" data-tab="custos" data-admin-only>CUSTOS & LUCRO</button>
+  </div>
+
+  <section class="view active" id="view-resumo" data-admin-only>
+    <div class="statusbar">
+      <div class="status"><span class="dot" id="printerDot"></span><span id="printerText">Impressão...</span></div>
+      <div class="status">Fila: <b id="pending">0</b></div>
+      <div class="status" id="dayLabel">Hoje</div>
+    </div>
+
+    <section class="cards">
+      <div class="card total"><div class="label">Total de hoje</div><div class="value" id="total">R$ 0,00</div></div>
+      <div class="card"><div class="label">Pedidos impressos</div><div class="value" id="count">0</div></div>
+      <div class="card"><div class="label">Ticket médio</div><div class="value" id="average">R$ 0,00</div></div>
+    </section>
+
+    <section class="payments">
+      <div class="pay"><span>PIX</span><b id="pix">R$ 0,00</b></div>
+      <div class="pay"><span>Dinheiro</span><b id="dinheiro">R$ 0,00</b></div>
+      <div class="pay"><span>Crédito</span><b id="credito">R$ 0,00</b></div>
+      <div class="pay"><span>Débito</span><b id="debito">R$ 0,00</b></div>
+      <div class="pay"><span>Mesa</span><b id="mesa">R$ 0,00</b></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Últimos pedidos</h2></div>
+      <div id="orders"><div class="empty">Carregando...</div></div>
+    </section>
+  </section>
+
+  <section class="view" id="view-estoque">
+    <section class="stock-summary">
+      <div class="mini"><span>Precisam de atenção</span><b id="attentionCount">0</b></div>
+      <div class="mini"><span>Sem estoque</span><b id="outCount">0</b></div>
+      <div class="mini"><span>Estoque baixo</span><b id="lowCount">0</b></div>
+      <div class="mini"><span>Valor em estoque</span><b id="stockValue">R$ 0,00</b></div>
+    </section>
+
+    <section class="stock-alert" id="attentionPanel">
+      <div class="stock-alert-title">
+        <span>⚠️ O que precisa de reposição</span>
+        <span class="count" id="attentionBadge">0 itens</span>
+      </div>
+      <div class="level-list" id="attentionList"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Níveis do estoque</h2></div>
+      <div class="help">A barra compara a quantidade atual com o <b>estoque ideal</b>. <b>Verde</b> = tranquilo, <b>amarelo</b> = chegou ao mínimo, <b>vermelho</b> = acabou.</div>
+      <div class="stock-legend"><span class="lg-ok">OK</span><span class="lg-low">Acabando</span><span class="lg-out">Sem estoque</span></div>
+
+      <div class="stock-filter">
+        <button class="active" data-stock-filter="attention">ATENÇÃO PRIMEIRO</button>
+        <button data-stock-filter="all">TODOS</button>
+        <button data-stock-filter="low">SÓ AMARELOS</button>
+        <button data-stock-filter="out">SÓ VERMELHOS</button>
+      </div>
+
+      <div class="tools">
+        <input id="stockSearch" placeholder="Buscar item...">
+        <button class="newbtn" id="newStockBtn">+ NOVO</button>
+      </div>
+
+      <div class="level-list" id="stockLevels"><div class="empty">Carregando estoque...</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Tabela do estoque</h2></div>
+      <div class="help">Itens sem estoque e acabando ficam no topo automaticamente.</div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Item</th><th>Status</th><th>Atual</th><th>Mínimo</th><th>Ideal</th><th>Custo base</th><th>Valor estoque</th><th>Rendimento</th><th>Ações</th></tr></thead>
+          <tbody id="stockTableBody"><tr><td colspan="9">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+      <div id="stockList" style="display:none"></div>
+    </section>
+  </section>
+
+  <section class="view" id="view-receitas" data-admin-only>
+    <section class="recipe-summary">
+      <div class="mini"><span>Receitas configuradas</span><b id="recipeConfigured">0</b></div>
+      <div class="mini"><span>Produtos no cardápio</span><b id="recipeTotal">0</b></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Receitas e baixa automática</h2></div>
+      <div class="help">Aqui você informa quanto vai em <b>1 unidade</b> de cada produto. Ex.: Pastel carne = Massa 1 un + Carne 120 g. Quando o pedido for <b>impresso</b>, essas quantidades são baixadas automaticamente.</div>
+      <div class="tools"><input id="recipeSearch" placeholder="Buscar produto..."></div>
+      <div id="recipeList"><div class="empty">Carregando receitas...</div></div>
+    </section>
+  </section>
+
+  <section class="view" id="view-custos" data-admin-only>
+    <section class="cost-summary">
+      <div class="cost-card"><span>Faturamento hoje</span><b id="ecoRevenue">R$ 0,00</b></div>
+      <div class="cost-card"><span>Custo estimado hoje</span><b id="ecoCost">R$ 0,00</b></div>
+      <div class="cost-card profit"><span>Lucro bruto estimado</span><b id="ecoProfit">R$ 0,00</b></div>
+      <div class="cost-card"><span>Margem bruta</span><b id="ecoMargin">0%</b></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Gráfico de lucro por produto</h2></div>
+      <div class="profit-chart" id="profitChart"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Tabela de custos e lucro</h2></div>
+      <div class="help">Lucro bruto estimado = preço de venda − custo da receita. Mão de obra, energia, gás e taxas só entram se você cadastrá-los como custo.</div>
+      <div class="tools"><input id="costSearch" placeholder="Buscar produto..."></div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Produto</th><th>Venda</th><th>Custo</th><th>Lucro/un.</th><th>Margem</th><th>Estoque rende</th><th>Receita</th><th>Ações</th></tr></thead>
+          <tbody id="costTableBody"><tr><td colspan="8">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<div class="modal" id="stockModal">
+  <div class="sheet">
+    <h2 id="stockTitle">Novo item</h2>
+    <label>Nome do item<input id="stockName" placeholder="Ex.: Carne"></label>
+    <label>Categoria<input id="stockCategory" placeholder="Ex.: Recheios"></label>
+    <div class="grid2">
+      <label>Unidade do estoque
+        <select id="stockUnit"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option><option value="un">un</option></select>
+      </label>
+      <label>Quantidade atual<input id="stockQty" inputmode="decimal" placeholder="Ex.: 3000"></label>
+    </div>
+    <div class="grid2">
+      <label>Estoque mínimo<input id="stockMin" inputmode="decimal" placeholder="Ex.: 500"></label>
+      <label>Estoque ideal<input id="stockIdeal" inputmode="decimal" placeholder="Ex.: 3000"></label>
+    </div>
+    <label>Consumo simples/porção (opcional)<input id="stockPortion" inputmode="decimal" placeholder="Ex.: 400"></label>
+    <div class="help" style="margin-top:8px"><b>Estoque ideal</b> é quanto você considera o estoque “cheio”. Ex.: batata = 3.000 g. É ele que dá a porcentagem da barra.</div>
+    <div class="help" style="margin-top:12px">Preço de compra: informe quanto você paga por uma quantidade. Ex.: <b>3 kg de batata por R$ 25,00</b>.</div>
+    <div class="grid2">
+      <label>Quantidade da compra<input id="purchaseQty" inputmode="decimal" placeholder="Ex.: 3"></label>
+      <label>Unidade da compra
+        <select id="purchaseUnit"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option><option value="un">un</option></select>
+      </label>
+    </div>
+    <label>Preço dessa compra (R$)<input id="purchasePrice" inputmode="decimal" placeholder="Ex.: 25,00"></label>
+    <label>Rendimento dessa compra em unidades do estoque (opcional)<input id="purchaseYield" inputmode="decimal" placeholder="Ex.: 7"></label>
+    <div class="purchase-example"><b>Exemplo:</b> 1 kg de massa rende 7 massas de pastel. Controle “Massa de pastel” em <b>un</b> e informe rendimento <b>7</b>.</div>
+    <div class="sheet-actions"><button class="cancel" id="cancelStock">CANCELAR</button><button class="save" id="saveStock">SALVAR</button></div>
+    <button class="delete" id="deleteStock" style="display:none">EXCLUIR ITEM</button>
+  </div>
+</div>
+
+<div class="modal" id="adjustModal">
+  <div class="sheet">
+    <h2 id="adjustTitle">Entrada de estoque</h2>
+    <label>Operação
+      <select id="adjustMode"><option value="add">Adicionar</option><option value="subtract">Dar saída manual</option><option value="set">Definir quantidade exata</option></select>
+    </label>
+    <div class="grid2">
+      <label>Quantidade<input id="adjustAmount" inputmode="decimal" placeholder="Ex.: 3"></label>
+      <label>Unidade
+        <select id="adjustUnit"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option><option value="un">un</option></select>
+      </label>
+    </div>
+    <label>Observação<input id="adjustNote" placeholder="Ex.: Compra de domingo"></label>
+    <div class="sheet-actions"><button class="cancel" id="cancelAdjust">CANCELAR</button><button class="save" id="saveAdjust">SALVAR</button></div>
+  </div>
+</div>
+
+<div class="modal" id="recipeModal">
+  <div class="sheet">
+    <h2 id="recipeTitle">Receita</h2>
+    <div class="help">Cadastre os ingredientes de <b>1 unidade</b> deste produto. Para adicionais, cadastre somente o peso extra.</div>
+    <div id="recipeRows"></div>
+    <button class="addcomponent" id="addComponent">+ ADICIONAR INGREDIENTE</button>
+    <div id="recipeCost" class="help" style="margin-top:10px">Custo estimado: R$ 0,00</div>
+    <div class="sheet-actions"><button class="cancel" id="cancelRecipe">CANCELAR</button><button class="save" id="saveRecipe">SALVAR RECEITA</button></div>
+    <button class="delete" id="clearRecipe">LIMPAR RECEITA</button>
+  </div>
+</div>
+
+
+<div class="modal" id="priceModal">
+  <div class="sheet">
+    <h2 id="priceTitle">Preço de venda</h2>
+    <div class="help">Valor usado no cálculo de lucro e margem do painel.</div>
+    <label>Preço de venda (R$)<input id="salePriceInput" inputmode="decimal" placeholder="Ex.: 16,00"></label>
+    <div class="sheet-actions"><button class="cancel" id="cancelPrice">CANCELAR</button><button class="save" id="savePrice">SALVAR</button></div>
+  </div>
+</div>
+
+<div class="login" id="login">
+  <div class="loginbox">
+    <div class="loginlogo"><b>NA</b> VIBE</div>
+    <p>Entre com seu PIN. O PIN do funcionário abre somente o estoque.</p>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="••••">
+    <button id="loginBtn">ENTRAR</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<div class="bottom"><div class="bottomin"><button class="logout" id="logoutBtn">SAIR</button><button class="reload" id="reloadBtn">ATUALIZAR</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbztHwzi7W9mMfVW9it7OuS35ESB11l92805P_cg5BEz7DWgQ8uIMfTr0rlQG8a9qvMZhg/exec";
+let AUTH_PIN="";
+let ROLE="";
+let DATA=null;
+let STOCK_FILTER="attention";
+let editingPriceKey=null;
+let editingStockId=null;
+let adjustingStockId=null;
+let editingRecipeKey=null;
+let refreshTimer=null;
+
+const money=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const numBR=n=>Number(n||0).toLocaleString("pt-BR",{maximumFractionDigits:3});
+
+function toast(msg){
+ const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove("show"),1800);
+}
+function jsonp(params){
+ return new Promise((resolve,reject)=>{
+   const cb="nv_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+   const s=document.createElement("script");let done=false;
+   const finish=()=>{if(done)return;done=true;try{delete window[cb]}catch(e){};try{s.remove()}catch(e){}};
+   const timer=setTimeout(()=>{finish();reject(new Error("tempo_esgotado"));},15000);
+   window[cb]=d=>{clearTimeout(timer);finish();resolve(d)};
+   s.onerror=()=>{clearTimeout(timer);finish();reject(new Error("falha_rede"))};
+   const q=new URLSearchParams({...params,callback:cb,_:Date.now()});
+   s.src=API_URL+"?"+q.toString();document.head.appendChild(s);
+ });
+}
+function showLogin(msg=""){document.getElementById("login").style.display="flex";document.getElementById("loginErr").textContent=msg;document.getElementById("pin").value="";setTimeout(()=>document.getElementById("pin").focus(),100)}
+function hideLogin(){document.getElementById("login").style.display="none"}
+function logout(){AUTH_PIN="";ROLE="";DATA=null;clearInterval(refreshTimer);showLogin()}
+function inventory(){return DATA?.inventory||{items:[],lowCount:0,outCount:0,totalValue:0}}
+function recipes(){return DATA?.recipes||{products:[],configuredCount:0,totalCount:0}}
+
+function setRoleUI(){
+ const badge=document.getElementById("roleBadge");
+ badge.textContent=ROLE==="admin"?"ADMINISTRADOR":"ESTOQUE";
+
+ document.querySelectorAll("[data-admin-only]").forEach(el=>el.style.display=ROLE==="admin"?"":"none");
+
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+
+ if(ROLE==="admin"){
+   document.querySelector('[data-tab="resumo"]').classList.add("active");
+   document.getElementById("view-resumo").classList.add("active");
+ }else{
+   document.querySelector('[data-tab="estoque"]').classList.add("active");
+   document.getElementById("view-estoque").classList.add("active");
+ }
+}
+
+function render(data){
+ DATA=data;
+ renderInventory(data.inventory||{items:[],lowCount:0,outCount:0,totalValue:0});
+
+ if(ROLE!=="admin")return;
+
+ document.getElementById("total").textContent=money(data.total);
+ document.getElementById("count").textContent=data.count||0;
+ document.getElementById("average").textContent=money(data.average);
+ document.getElementById("pix").textContent=money(data.payments?.pix);
+ document.getElementById("dinheiro").textContent=money(data.payments?.dinheiro);
+ document.getElementById("credito").textContent=money(data.payments?.credito);
+ document.getElementById("debito").textContent=money(data.payments?.debito);
+ document.getElementById("mesa").textContent=money(data.payments?.mesa);
+ document.getElementById("pending").textContent=data.pending||0;
+
+ const d=document.getElementById("printerDot"),t=document.getElementById("printerText");
+ d.className="dot "+(data.printer?.online?"on":"off");t.textContent=data.printer?.online?"Impressão online":"Impressão offline";
+
+ if(data.day){const p=data.day.split("-");document.getElementById("dayLabel").textContent=p.length===3?`${p[2]}/${p[1]}/${p[0]}`:"Hoje"}
+
+ renderOrders(data.recent||[]);
+ renderRecipes(data.recipes||{products:[],configuredCount:0,totalCount:0});
+ renderEconomics(data.economics||{},data.recipes||{products:[]});
+}
+
+function renderOrders(list){
+ const box=document.getElementById("orders");
+ if(!list.length){box.innerHTML='<div class="empty">Nenhum pedido registrado.</div>';return}
+ box.innerHTML=list.map(o=>`<div class="order"><div class="order-top"><div><div class="order-num">Pedido #${esc(o.number||"—")}</div><div class="meta">${esc(o.date||"")} • ${esc(o.time||"")}<br>${esc(o.source||"")}${o.client?" • "+esc(o.client):""}${o.waiter?" • Garçom: "+esc(o.waiter):""}<br>${esc(o.payment||"")}</div></div><div class="order-total">${money(o.total)}</div></div><button class="reprint" data-reprint="${esc(o.id)}">REIMPRIMIR</button></div>`).join("");
+ box.querySelectorAll("[data-reprint]").forEach(b=>b.onclick=async()=>{if(!confirm("Reimprimir este pedido?"))return;try{const r=await jsonp({action:"admin_reprint",pin:AUTH_PIN,id:b.dataset.reprint});if(!r.ok)throw new Error(r.error);toast("Reimpressão enviada")}catch(e){alert("Não consegui reimprimir.")}});
+}
+
+function levelStateLabel(x){
+ if(x.status==="out")return "SEM ESTOQUE";
+ if(x.status==="low")return "ACABANDO";
+ return "ESTOQUE OK";
+}
+
+function levelRowHtml(x,withButton=true){
+ const ideal=x.idealConfigured?`Ideal: ${numBR(x.ideal)} ${esc(x.unit)}`:"Defina o estoque ideal";
+ const min=x.min>0?`Mínimo: ${numBR(x.min)} ${esc(x.unit)}`:"Mínimo não definido";
+ const portion=(x.portions===null||x.portions===undefined)?"":` • ${x.portions} porções aprox.`;
+
+ return `<div class="level-row ${esc(x.status)}">
+   <div class="level-head">
+     <div class="level-name">${esc(x.name)}<div class="level-sub">${min} • ${ideal}${portion}</div></div>
+     <div class="level-number">${numBR(x.qty)} ${esc(x.unit)}</div>
+   </div>
+   <div class="level-track" aria-label="${esc(x.name)}: ${x.percent}% do estoque ideal">
+     <div class="level-fill" style="width:${Math.max(2,Number(x.percent||0))}%"></div>
+   </div>
+   <div class="level-actions">
+     <span class="level-state ${esc(x.status)}">${levelStateLabel(x)}${x.idealConfigured?` • ${x.percent}%`:""}</span>
+     ${withButton?`<button class="quick-entry" data-quick="${esc(x.id)}">+ REPOR</button>`:""}
+   </div>
+ </div>`;
+}
+
+function bindQuickEntries(root){
+ root.querySelectorAll("[data-quick]").forEach(b=>b.onclick=()=>openAdjust(b.dataset.quick,"add"));
+}
+
+
+function renderStockTable(list){
+ const body=document.getElementById("stockTableBody");
+ if(!body)return;
+ if(!list.length){body.innerHTML='<tr><td colspan="9">Nenhum item encontrado.</td></tr>';return}
+ const statusText={out:"SEM ESTOQUE",low:"ACABANDO",ok:"OK"};
+ body.innerHTML=list.map(x=>`
+   <tr class="${x.status==="out"?"row-out":x.status==="low"?"row-low":""}">
+     <td><b>${esc(x.name)}</b><br><span class="small">${esc(x.category||"")}</span></td>
+     <td><span class="status-pill ${esc(x.status)}">${statusText[x.status]||"OK"}</span></td>
+     <td><b>${numBR(x.qty)} ${esc(x.unit)}</b></td>
+     <td>${numBR(x.min)} ${esc(x.unit)}</td>
+     <td>${x.idealConfigured?numBR(x.ideal)+" "+esc(x.unit):"—"}</td>
+     <td>${money(x.costPerUnit||0)} / ${esc(x.unit)}</td>
+     <td><b>${money(x.stockValue||0)}</b></td>
+     <td>${x.portions===null||x.portions===undefined?"—":x.portions+" porções"}</td>
+     <td><div class="table-actions"><button class="a1" data-tadd="${esc(x.id)}">+ ENTRADA</button><button class="a2" data-tadj="${esc(x.id)}">AJUSTAR</button><button class="a3" data-tedit="${esc(x.id)}">EDITAR</button></div></td>
+   </tr>`).join("");
+ body.querySelectorAll("[data-tadd]").forEach(b=>b.onclick=()=>openAdjust(b.dataset.tadd,"add"));
+ body.querySelectorAll("[data-tadj]").forEach(b=>b.onclick=()=>openAdjust(b.dataset.tadj,"set"));
+ body.querySelectorAll("[data-tedit]").forEach(b=>b.onclick=()=>openStock(b.dataset.tedit));
+}
+
+function renderInventory(inv){
+ document.getElementById("attentionCount").textContent=inv.attentionCount||0;
+ document.getElementById("lowCount").textContent=inv.lowCount||0;
+ document.getElementById("outCount").textContent=inv.outCount||0;
+ document.getElementById("stockValue").textContent=money(inv.totalValue||0);
+
+ const all=inv.items||[];
+ const attention=all.filter(x=>x.status==="low"||x.status==="out");
+
+ const attentionPanel=document.getElementById("attentionPanel");
+ const attentionList=document.getElementById("attentionList");
+ const attentionBadge=document.getElementById("attentionBadge");
+
+ attentionBadge.textContent=`${attention.length} ${attention.length===1?"item":"itens"}`;
+
+ if(attention.length){
+   attentionPanel.classList.add("has-alert");
+   attentionList.innerHTML=attention.map(x=>levelRowHtml(x,true)).join("");
+   bindQuickEntries(attentionList);
+ }else{
+   attentionPanel.classList.remove("has-alert");
+   attentionList.innerHTML='<div class="empty">Tudo certo por enquanto. Nenhum item no mínimo ou zerado. ✅</div>';
+ }
+
+ const q=(document.getElementById("stockSearch").value||"").toLowerCase().trim();
+ let list=all.filter(x=>(x.name+" "+x.category).toLowerCase().includes(q));
+
+ if(STOCK_FILTER==="low")list=list.filter(x=>x.status==="low");
+ else if(STOCK_FILTER==="out")list=list.filter(x=>x.status==="out");
+ else if(STOCK_FILTER==="attention"){
+   const rank={out:0,low:1,ok:2};
+   list=[...list].sort((a,b)=>(rank[a.status]-rank[b.status]) || (Number(a.percent||0)-Number(b.percent||0)));
+ }
+
+ renderStockTable(list);
+ const levels=document.getElementById("stockLevels");
+ levels.innerHTML=list.length?list.map(x=>levelRowHtml(x,true)).join(""):'<div class="empty">Nenhum item nesse filtro.</div>';
+ bindQuickEntries(levels);
+
+ const box=document.getElementById("stockList");
+ if(!list.length){box.innerHTML='<div class="empty">Nenhum item encontrado.</div>';return}
+
+ let cat="",html="";
+ list.forEach(x=>{
+   if(cat!==x.category){cat=x.category;html+=`<div class="group">${esc(cat||"Outros")}</div>`}
+
+   const badge=x.status==="out"
+     ? '<span class="badge out">SEM ESTOQUE</span>'
+     : x.status==="low"
+       ? '<span class="badge low">ACABANDO</span>'
+       : '<span class="badge ok">OK</span>';
+
+   const portions=x.portions===null||x.portions===undefined?"":` • Rende aprox. <b>${x.portions}</b> porções`;
+   const purchase=x.purchaseQty>0&&x.purchasePrice>0?`Compra: ${numBR(x.purchaseQty)} ${esc(x.purchaseUnit)} por ${money(x.purchasePrice)}`:"Preço de compra não cadastrado";
+   const ideal=x.idealConfigured?` • Ideal: <b>${numBR(x.ideal)} ${esc(x.unit)}</b>`:" • Ideal não cadastrado";
+
+   html+=`<div class="stock-item ${esc(x.status)}">
+     <div class="topline">
+       <div>
+         <div class="name">${esc(x.name)}</div>
+         <div class="small">Mínimo: ${numBR(x.min)} ${esc(x.unit)}${ideal}${x.portion>0?` • Porção: ${numBR(x.portion)} ${esc(x.unit)}`:""}${portions}</div>
+         <div class="cost">${purchase} • Valor atual: <b>${money(x.stockValue)}</b></div>
+         ${badge}
+       </div>
+       <div class="qty">${numBR(x.qty)} ${esc(x.unit)}</div>
+     </div>
+     <div class="actions">
+       <button class="add" data-add="${esc(x.id)}">+ ENTRADA</button>
+       <button class="adjust" data-adjust="${esc(x.id)}">AJUSTAR</button>
+       <button class="edit" data-edit="${esc(x.id)}">EDITAR</button>
+     </div>
+   </div>`;
+ });
+
+ box.innerHTML=html;
+ box.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>openAdjust(b.dataset.add,"add"));
+ box.querySelectorAll("[data-adjust]").forEach(b=>b.onclick=()=>openAdjust(b.dataset.adjust,"set"));
+ box.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openStock(b.dataset.edit));
+}
+
+function stockById(id){return inventory().items.find(x=>x.id===id)||null}
+
+function openStock(id=null){
+ editingStockId=id;const x=id?stockById(id):null;
+ document.getElementById("stockTitle").textContent=x?"Editar item":"Novo item";
+ document.getElementById("stockName").value=x?.name||"";
+ document.getElementById("stockCategory").value=x?.category||"";
+ document.getElementById("stockUnit").value=x?.unit||"g";
+ document.getElementById("stockQty").value=x?numBR(x.qty):"";
+ document.getElementById("stockQty").disabled=!!x;
+ document.getElementById("stockMin").value=x?numBR(x.min):"";
+ document.getElementById("stockIdeal").value=x?numBR(x.ideal):"";
+ document.getElementById("stockPortion").value=x?numBR(x.portion):"";
+ document.getElementById("purchaseQty").value=x?numBR(x.purchaseQty):"";
+ document.getElementById("purchaseUnit").value=x?.purchaseUnit||x?.unit||"g";
+ document.getElementById("purchasePrice").value=x?String(x.purchasePrice||"").replace(".",","):"";
+ document.getElementById("purchaseYield").value=x?numBR(x.purchaseYield||0):"";
+ document.getElementById("deleteStock").style.display=x?"block":"none";
+ document.getElementById("stockModal").classList.add("open");
+}
+function closeStock(){document.getElementById("stockModal").classList.remove("open")}
+
+async function saveStock(){
+ const name=document.getElementById("stockName").value.trim();if(!name){alert("Digite o nome.");return}
+ const params={
+   action:editingStockId?"admin_inventory_update":"admin_inventory_add",pin:AUTH_PIN,
+   name,category:document.getElementById("stockCategory").value.trim()||"Outros",
+   unit:document.getElementById("stockUnit").value,
+   min:document.getElementById("stockMin").value||"0",
+   ideal:document.getElementById("stockIdeal").value||"0",
+   portion:document.getElementById("stockPortion").value||"0",
+   purchaseQty:document.getElementById("purchaseQty").value||"0",
+   purchaseUnit:document.getElementById("purchaseUnit").value,
+   purchasePrice:document.getElementById("purchasePrice").value||"0",
+   purchaseYield:document.getElementById("purchaseYield").value||"0"
+ };
+ if(editingStockId)params.id=editingStockId;else params.qty=document.getElementById("stockQty").value||"0";
+ try{const r=await jsonp(params);if(!r.ok)throw new Error(r.error);closeStock();toast("Estoque salvo");await load(true)}catch(e){alert(e.message==="unidades_incompativeis"?"As unidades escolhidas não combinam.":"Não consegui salvar o item.")}
+}
+async function deleteStock(){
+ if(!editingStockId)return;if(!confirm("Excluir este item do estoque?"))return;
+ try{const r=await jsonp({action:"admin_inventory_delete",pin:AUTH_PIN,id:editingStockId});if(!r.ok)throw new Error(r.error);closeStock();toast("Item excluído");await load(true)}catch(e){alert(e.message==="ingrediente_em_uso"?"Este ingrediente está sendo usado em uma receita. Remova-o da receita primeiro.":"Não consegui excluir.")}
+}
+
+function compatibleUnits(unit){
+ const u=String(unit||"").toLowerCase();
+ if(u==="g"||u==="kg")return ["g","kg"];
+ if(u==="ml"||u==="l")return ["ml","L"];
+ return ["un"];
+}
+function setSelectOptions(sel,options,value){
+ sel.innerHTML=options.map(x=>`<option value="${x}">${x==="compra"?"compra/pacote":x}</option>`).join("");sel.value=options.includes(value)?value:options[0];
+}
+function openAdjust(id,mode){
+ const x=stockById(id);if(!x)return;adjustingStockId=id;
+ document.getElementById("adjustTitle").textContent=x.name;
+ document.getElementById("adjustMode").value=mode;
+ document.getElementById("adjustAmount").value="";
+ const units=compatibleUnits(x.unit);
+ if(Number(x.purchaseYield||0)>0)units.push("compra");
+ setSelectOptions(document.getElementById("adjustUnit"),units,x.unit);
+ document.getElementById("adjustNote").value="";
+ document.getElementById("adjustModal").classList.add("open");
+}
+function closeAdjust(){document.getElementById("adjustModal").classList.remove("open")}
+async function saveAdjust(){
+ const amount=document.getElementById("adjustAmount").value.trim();if(!amount){alert("Digite a quantidade.");return}
+ try{const r=await jsonp({action:"admin_inventory_adjust",pin:AUTH_PIN,id:adjustingStockId,mode:document.getElementById("adjustMode").value,amount,unit:document.getElementById("adjustUnit").value,note:document.getElementById("adjustNote").value.trim()});if(!r.ok)throw new Error(r.error);closeAdjust();toast("Estoque atualizado");await load(true)}catch(e){alert(e.message==="unidades_incompativeis"?"Unidade incompatível com este item.":e.message==="rendimento_compra_nao_configurado"?"Cadastre o rendimento da compra deste item primeiro.":"Não consegui ajustar o estoque.")}
+}
+
+function renderRecipes(rec){
+ document.getElementById("recipeConfigured").textContent=rec.configuredCount||0;
+ document.getElementById("recipeTotal").textContent=rec.totalCount||0;
+ const q=(document.getElementById("recipeSearch").value||"").toLowerCase().trim();
+ const list=(rec.products||[]).filter(x=>(x.name+" "+x.category).toLowerCase().includes(q));
+ const box=document.getElementById("recipeList");
+ if(!list.length){box.innerHTML='<div class="empty">Nenhum produto encontrado.</div>';return}
+ let cat="",html="";
+ list.forEach(x=>{
+   if(cat!==x.category){cat=x.category;html+=`<div class="group">${esc(cat)}</div>`}
+   const status=x.configured?'<span class="badge ok">CONFIGURADA</span>':'<span class="badge low">FALTA CONFIGURAR</span>';
+   const make=x.canMake===null||x.canMake===undefined?"":` • Estoque rende aprox. <b>${x.canMake}</b> un.`;
+   html+=`<div class="recipe-item"><div class="topline"><div><div class="name">${esc(x.name)}</div><div class="small">${x.components.length} ingrediente(s)${make}</div>${status}</div><div class="qty">${money(x.cost)}</div></div><div class="cost">Venda ${money(x.salePrice)} • Custo ${money(x.cost)} • <b>Lucro bruto ${money(x.profit)}</b> • Margem ${numBR(x.margin)}%</div><button data-recipe="${esc(x.key)}">CONFIGURAR RECEITA</button></div>`;
+ });
+ box.innerHTML=html;box.querySelectorAll("[data-recipe]").forEach(b=>b.onclick=()=>openRecipe(b.dataset.recipe));
+}
+function recipeByKey(key){return recipes().products.find(x=>x.key===key)||null}
+function openRecipe(key){
+ const r=recipeByKey(key);if(!r)return;editingRecipeKey=key;
+ document.getElementById("recipeTitle").textContent=r.name;
+ document.getElementById("recipeRows").innerHTML="";
+ (r.components||[]).forEach(c=>addRecipeRow(c));
+ if(!(r.components||[]).length)addRecipeRow();
+ updateRecipeCost();
+ document.getElementById("recipeModal").classList.add("open");
+}
+function closeRecipe(){document.getElementById("recipeModal").classList.remove("open")}
+function ingredientOptions(selected=""){
+ return inventory().items.map(x=>`<option value="${esc(x.id)}" ${x.id===selected?"selected":""}>${esc(x.name)} (${esc(x.unit)})</option>`).join("");
+}
+function addRecipeRow(c=null){
+ const row=document.createElement("div");row.className="recipe-row";
+ row.innerHTML=`<div class="recipe-grid"><label>Ingrediente<select class="ri">${ingredientOptions(c?.stockId||"")}</select></label><label>Qtd<input class="rq" inputmode="decimal" value="${c?numBR(c.qty):""}" placeholder="120"></label><label>Unidade<select class="ru"></select></label></div><button class="remove">REMOVER</button>`;
+ document.getElementById("recipeRows").appendChild(row);
+ const ing=row.querySelector(".ri"),unit=row.querySelector(".ru");
+ const updateUnits=()=>{const s=stockById(ing.value);setSelectOptions(unit,compatibleUnits(s?.unit||"un"),c?.unit||s?.unit||"un");updateRecipeCost()};
+ ing.onchange=updateUnits;row.querySelector(".rq").oninput=updateRecipeCost;row.querySelector(".remove").onclick=()=>{row.remove();updateRecipeCost()};updateUnits();
+}
+function readRecipeRows(){
+ return [...document.querySelectorAll("#recipeRows .recipe-row")].map(row=>({stockId:row.querySelector(".ri").value,qty:row.querySelector(".rq").value.trim(),unit:row.querySelector(".ru").value})).filter(x=>x.stockId&&x.qty);
+}
+function convertLocal(v,from,to){
+ const fam=u=>["g","kg"].includes(u)?"m":["ml","L"].includes(u)?"v":"u",factor=u=>u==="kg"||u==="L"?1000:1;
+ if(fam(from)!==fam(to))return 0;return Number(String(v).replace(",","."))*factor(from)/factor(to);
+}
+function updateRecipeCost(){
+ let cost=0;readRecipeRows().forEach(c=>{const s=stockById(c.stockId);if(!s)return;cost+=convertLocal(c.qty,c.unit,s.unit)*Number(s.costPerUnit||0)});
+ document.getElementById("recipeCost").textContent="Custo estimado desta receita: "+money(cost);
+}
+async function saveRecipe(){
+ const components=readRecipeRows().map(x=>({...x,qty:Number(String(x.qty).replace(",","."))}));
+ if(!components.length){alert("Adicione pelo menos um ingrediente.");return}
+ try{const r=await jsonp({action:"admin_recipe_save",pin:AUTH_PIN,productKey:editingRecipeKey,components:JSON.stringify(components)});if(!r.ok)throw new Error(r.error);closeRecipe();toast("Receita salva");await load(true)}catch(e){alert("Não consegui salvar a receita. Confira as quantidades e unidades.")}
+}
+async function clearRecipe(){
+ if(!confirm("Limpar esta receita?"))return;
+ try{const r=await jsonp({action:"admin_recipe_clear",pin:AUTH_PIN,productKey:editingRecipeKey});if(!r.ok)throw new Error(r.error);closeRecipe();toast("Receita limpa");await load(true)}catch(e){alert("Não consegui limpar a receita.")}
+}
+
+
+function profitClass(m){const n=Number(m||0);return n<25?"low":n<45?"mid":""}
+
+function renderEconomics(eco,rec){
+ document.getElementById("ecoRevenue").textContent=money(DATA?.total||0);
+ document.getElementById("ecoCost").textContent=money(eco.cost||0);
+ document.getElementById("ecoProfit").textContent=money(eco.grossProfit||0);
+ document.getElementById("ecoMargin").textContent=numBR(eco.grossMargin||0)+"%";
+ renderProfitChart(rec);renderCostTable(rec);
+}
+
+function renderProfitChart(rec){
+ const box=document.getElementById("profitChart");if(!box)return;
+ const list=(rec.products||[]).filter(x=>x.configured).sort((a,b)=>Number(b.profit||0)-Number(a.profit||0)).slice(0,10);
+ if(!list.length){box.innerHTML='<div class="empty">Configure as receitas para ver o gráfico.</div>';return}
+ const max=Math.max(...list.map(x=>Math.max(0,Number(x.profit||0))),1);
+ box.innerHTML=list.map(x=>`<div class="profit-row"><div class="pname">${esc(x.name)}</div><div class="margin-track"><div class="margin-fill ${profitClass(x.margin)}" style="width:${Math.max(3,Math.min(100,(Math.max(0,Number(x.profit||0))/max)*100))}%"></div></div><div class="pval">${money(x.profit)} / un.</div></div>`).join("");
+}
+
+function renderCostTable(rec){
+ const body=document.getElementById("costTableBody");if(!body)return;
+ const q=(document.getElementById("costSearch")?.value||"").toLowerCase().trim();
+ const list=(rec.products||[]).filter(x=>(x.name+" "+x.category).toLowerCase().includes(q));
+ if(!list.length){body.innerHTML='<tr><td colspan="8">Nenhum produto encontrado.</td></tr>';return}
+ body.innerHTML=list.map(x=>{
+   const recipe=x.configured?'<span class="status-pill ok">OK</span>':'<span class="status-pill low">FALTA</span>';
+   return `<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.category)}</span></td><td><b>${money(x.salePrice)}</b></td><td>${money(x.cost)}</td><td><b>${money(x.profit)}</b></td><td><div style="min-width:130px"><div class="margin-track"><div class="margin-fill ${profitClass(x.margin)}" style="width:${Math.max(0,Math.min(100,Number(x.margin||0)))}%"></div></div><div class="small">${numBR(x.margin)}%</div></div></td><td>${x.canMake===null||x.canMake===undefined?"—":x.canMake+" un."}</td><td>${recipe}</td><td><div class="table-actions"><button class="a2" data-price="${esc(x.key)}">PREÇO</button><button class="a3" data-costrecipe="${esc(x.key)}">RECEITA</button></div></td></tr>`;
+ }).join("");
+ body.querySelectorAll("[data-price]").forEach(b=>b.onclick=()=>openPrice(b.dataset.price));
+ body.querySelectorAll("[data-costrecipe]").forEach(b=>b.onclick=()=>openRecipe(b.dataset.costrecipe));
+}
+
+function openPrice(key){const p=recipeByKey(key);if(!p)return;editingPriceKey=key;document.getElementById("priceTitle").textContent=p.name;document.getElementById("salePriceInput").value=numBR(p.salePrice||0);document.getElementById("priceModal").classList.add("open")}
+function closePrice(){document.getElementById("priceModal").classList.remove("open")}
+async function savePrice(){const value=document.getElementById("salePriceInput").value.trim();if(value===""){alert("Digite o preço.");return}try{const r=await jsonp({action:"admin_product_price",pin:AUTH_PIN,productKey:editingPriceKey,salePrice:value});if(!r.ok)throw new Error(r.error);closePrice();toast("Preço atualizado");await load(true)}catch(e){alert("Não consegui salvar o preço.")}}
+
+async function load(silent=false){
+ if(!AUTH_PIN||!ROLE){showLogin();return}
+ try{
+   const action=ROLE==="admin"?"admin_summary":"stock_summary";
+   const data=await jsonp({action,pin:AUTH_PIN});
+   if(!data.ok)throw new Error(data.error||"erro");
+   render(data);if(!silent)toast("Atualizado");
+ }catch(e){
+   if(e.message==="pin_invalido"||e.message==="sem_permissao"){logout();return}
+   if(!silent)toast("Falha ao atualizar");
+ }
+}
+
+async function doLogin(){
+ const p=document.getElementById("pin").value.trim();if(!p){document.getElementById("loginErr").textContent="Digite o PIN.";return}
+ document.getElementById("loginErr").textContent="Entrando...";
+ try{
+   const r=await jsonp({action:"login",pin:p});if(!r.ok)throw new Error(r.error);
+   AUTH_PIN=p;ROLE=r.role;hideLogin();setRoleUI();await load(true);clearInterval(refreshTimer);refreshTimer=setInterval(()=>load(true),7000);
+ }catch(e){AUTH_PIN="";ROLE="";document.getElementById("loginErr").textContent="PIN incorreto."}
+}
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{if(b.style.display==="none")return;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById("view-"+b.dataset.tab).classList.add("active")});
+document.getElementById("stockSearch").oninput=()=>renderInventory(inventory());
+document.querySelectorAll("[data-stock-filter]").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+   STOCK_FILTER=btn.dataset.stockFilter;
+   document.querySelectorAll("[data-stock-filter]").forEach(x=>x.classList.toggle("active",x===btn));
+   renderInventory(inventory());
+ });
+});
+document.getElementById("recipeSearch").oninput=()=>renderRecipes(recipes());
+document.getElementById("costSearch").oninput=()=>renderCostTable(recipes());
+document.getElementById("newStockBtn").onclick=()=>openStock();
+document.getElementById("cancelStock").onclick=closeStock;
+document.getElementById("saveStock").onclick=saveStock;
+document.getElementById("deleteStock").onclick=deleteStock;
+document.getElementById("cancelAdjust").onclick=closeAdjust;
+document.getElementById("saveAdjust").onclick=saveAdjust;
+document.getElementById("addComponent").onclick=()=>addRecipeRow();
+document.getElementById("cancelRecipe").onclick=closeRecipe;
+document.getElementById("saveRecipe").onclick=saveRecipe;
+document.getElementById("clearRecipe").onclick=clearRecipe;
+document.getElementById("stockModal").onclick=e=>{if(e.target.id==="stockModal")closeStock()};
+document.getElementById("adjustModal").onclick=e=>{if(e.target.id==="adjustModal")closeAdjust()};
+document.getElementById("recipeModal").onclick=e=>{if(e.target.id==="recipeModal")closeRecipe()};
+document.getElementById("loginBtn").onclick=doLogin;
+document.getElementById("pin").onkeydown=e=>{if(e.key==="Enter")doLogin()};
+document.getElementById("logoutBtn").onclick=logout;
+document.getElementById("reloadBtn").onclick=()=>load();
+showLogin();
+
+document.getElementById("cancelPrice").onclick=closePrice;
+document.getElementById("savePrice").onclick=savePrice;
+document.getElementById("priceModal").onclick=e=>{if(e.target.id==="priceModal")closePrice();};
+</script>
+</body>
+</html>
