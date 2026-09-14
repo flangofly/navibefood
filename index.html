@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Na Vibe Food — Cardápio Online</title>
+<style>
+:root{--green:#79d51a;--green-dark:#5db20e;--black:#111;--paper:#f4f4f1;--muted:#6f6f6f;--line:#e8e8e3;--danger:#c62828}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--black);font-family:Arial,Helvetica,sans-serif;padding-bottom:104px}
+a{color:inherit}
+header{background:#111;color:#fff;padding:18px 14px 14px;text-align:center;box-shadow:0 3px 14px #0002}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.logo{font-size:38px;font-weight:900;font-style:italic;line-height:1}.logo b{color:var(--green)}
+.sub{font-weight:900;letter-spacing:2px;font-size:12px;margin-top:4px}
+.insta{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:9px 13px;border:1px solid #ffffff2e;border-radius:999px;text-decoration:none;font-weight:800;font-size:14px;background:#ffffff0c}
+.category-nav{position:sticky;top:0;z-index:8;background:#f4f4f1ee;backdrop-filter:blur(9px);border-bottom:1px solid #ddd;padding:9px 10px}
+.category-nav .inner{max-width:820px;margin:auto;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.category-nav .inner::-webkit-scrollbar{display:none}
+.category-nav a{flex:0 0 auto;text-decoration:none;background:#fff;border:1px solid #ddd;border-radius:999px;padding:9px 13px;font-weight:900;font-size:13px}
+.wrap{max-width:820px;margin:auto;padding:14px}
+.intro,.menu-group{background:#fff;border-radius:20px;padding:15px;margin:14px 0;box-shadow:0 3px 16px #0000000b}
+.intro h1{font-size:25px;margin:0 0 7px}.intro p{margin:0;color:#666;line-height:1.45}
+.menu-group{scroll-margin-top:70px}
+.group-head{display:flex;align-items:center;gap:12px;background:#111;color:#fff;border-radius:15px;padding:14px 15px;margin-bottom:12px}
+.group-icon{font-size:24px}.group-head h2{font-size:24px;margin:0;letter-spacing:.4px}.group-head p{margin:4px 0 0;color:#d4d4d4;font-size:13px}
+.subcat{padding-top:4px}.subcat + .subcat{border-top:2px dashed #e6e6df;margin-top:17px;padding-top:17px}
+h3{font-size:19px;margin:0 0 10px;display:flex;align-items:center;gap:8px}h3:before{content:'';width:6px;height:23px;border-radius:5px;background:var(--green);display:inline-block}
+.grid{display:grid;gap:9px}
+.item{background:#fafafa;border:1px solid #ecece7;border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:70px}
+.item-left{min-width:0}.item strong{font-size:16px;display:block;line-height:1.25}.item small{display:block;color:#777;margin-top:4px;line-height:1.25}
+.item-right{display:flex;align-items:center;gap:9px;flex:0 0 auto}.price{font-weight:900;white-space:nowrap;font-size:16px}
+.add{background:var(--green);border:0;border-radius:11px;padding:10px 11px;font-weight:900;cursor:pointer;min-width:88px}.add:active{transform:scale(.97)}
+.item.sold-out{background:#f2f2f2;opacity:.78;border-style:dashed}.item.sold-out strong{text-decoration:none}
+.sold-badge{display:inline-block;margin-top:6px;background:var(--danger);color:#fff;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;letter-spacing:.3px}
+.add.sold{background:#d8d8d8;color:#777;cursor:not-allowed;min-width:98px}
+.notice{font-size:13px;color:#666;background:#f8f8f5;border-radius:12px;padding:10px 12px;margin-top:10px}
+.extras-box{margin-top:12px;background:#f5faef;border:1px solid #dfeccf;border-radius:13px;padding:11px 12px}.extras-box b,.extras-box span{display:block}.extras-box span{font-size:13px;color:#666;margin-top:4px}
+.footer-card{text-align:center;background:#111;color:#fff;border-radius:18px;padding:18px 14px;margin-top:16px}.footer-card p{margin:0 0 10px;color:#ddd}.footer-card .insta{margin:0;background:var(--green);color:#111;border:0}
+.cartbar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:796px;background:#111;color:#fff;border-radius:17px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:15;box-shadow:0 8px 30px #0006}
+#cartText{font-weight:800;font-size:14px}.checkout{background:var(--green);border:0;border-radius:11px;padding:11px 13px;font-weight:900;white-space:nowrap;cursor:pointer}
+.modal{display:none;position:fixed;inset:0;background:#000a;z-index:30;padding:12px;align-items:flex-end;justify-content:center}.modal.open{display:flex}
+.sheet{background:#fff;border-radius:22px 22px 16px 16px;width:100%;max-width:720px;max-height:90vh;overflow:auto;padding:18px}.sheet h2{font-size:25px;margin:2px 0 14px}
+.close{float:right;border:0;background:#eee;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #eee}.row-info small{display:block;color:#666;margin-top:4px}
+.qty{white-space:nowrap}.qty button{border:0;border-radius:8px;width:32px;height:32px;font-weight:900;cursor:pointer}
+input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px;font-size:16px;background:#fff}
+.contact-note{font-size:12px;color:#777;margin:-7px 0 12px;line-height:1.4}.consent{display:flex;align-items:flex-start;gap:9px;background:#f6faef;border:1px solid #dfeacb;border-radius:12px;padding:11px;margin:5px 0 13px;font-size:13px;line-height:1.35}.consent input{width:auto;margin:2px 0 0;transform:scale(1.15);flex:0 0 auto}
+.total{font-size:20px;font-weight:900;text-align:right;margin:14px 0}.send{width:100%;padding:14px;border:0;border-radius:12px;background:var(--green);font-weight:900;font-size:17px;cursor:pointer}
+.payment-card{background:#111;color:#fff;border-radius:18px;padding:18px;margin:18px 0;box-shadow:0 3px 14px #0002}
+.payment-card h3{margin:0 0 10px;font-size:21px}.payment-methods{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.payment-methods span{background:#ffffff14;border:1px solid #ffffff22;border-radius:999px;padding:8px 11px;font-weight:800;font-size:13px}
+.pix-line{background:#fff;color:#111;border-radius:13px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.pix-line small{display:block;color:#666;margin-bottom:3px}
+.pix-key{font-weight:900;letter-spacing:.4px}.copy-pix{border:0;background:var(--green);border-radius:9px;padding:9px 11px;font-weight:900;cursor:pointer}
+.payment-info{background:#f3f8ed;border:1px solid #dcebcf;border-radius:12px;padding:12px;margin:0 0 12px}.payment-info p{margin:0 0 8px}.payment-info .pix-key{display:inline-block;margin:3px 8px 3px 0}
+.toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(15px);background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-weight:800;font-size:13px;z-index:50;opacity:0;pointer-events:none;transition:.22s}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.custom-product{font-size:17px;font-weight:900;margin-bottom:4px}.custom-price{font-size:14px;color:#666;margin-bottom:12px}
+.extra-option{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px;border:1px solid #e6e6e0;border-radius:12px;margin:8px 0;background:#fafafa}.extra-option label{display:flex;align-items:center;gap:10px;font-weight:800;flex:1}.extra-option input{width:auto;margin:0;transform:scale(1.25)}
+.custom-total{font-weight:900;text-align:right;margin:14px 0;font-size:18px}.extra-question{font-size:17px;font-weight:900;margin:16px 0 9px}.extra-help{font-size:13px;color:#666;margin:-3px 0 12px;line-height:1.4}
+.extra-choice-wrap{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}.extra-choice{border:2px solid #e2e2dc;background:#fff;border-radius:14px;padding:14px 10px;font-weight:900;cursor:pointer;text-align:center}.extra-choice.active{border-color:var(--green);background:#f3faeb}.extra-choice small{display:block;font-weight:600;color:#777;margin-top:4px}
+#extrasArea{display:none;background:#fafafa;border:1px solid #e9e9e3;border-radius:14px;padding:11px;margin-top:8px}#extrasArea.show{display:block}
+@media(max-width:620px){.wrap{padding:10px}.logo{font-size:34px}.intro{padding:15px}.intro h1{font-size:22px}.menu-group{padding:11px;border-radius:17px}.group-head{padding:12px}.group-head h2{font-size:21px}.item{align-items:flex-start;flex-direction:column}.item-right{width:100%;justify-content:space-between}.add{min-width:108px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div><div class="logo"><b>NA</b> VIBE</div><div class="sub">FOOD TRUCK</div></div></div>
+  <a class="insta" href="https://www.instagram.com/navibefood/" target="_blank" rel="noopener noreferrer">◎ @navibefood</a>
+</header>
+
+<nav class="category-nav"><div class="inner">
+  <a href="#pasteis">🥟 PASTÉIS</a><a href="#doces">🍫 DOCES</a><a href="#batatas">🍟 BATATAS & ANÉIS</a><a href="#bebidas">🥤 BEBIDAS</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="intro"><h1>Cardápio Online</h1><p>Escolha seus itens, personalize seus pastéis, confira o pedido e envie direto pelo WhatsApp.</p></section>
+
+  <section class="menu-group" id="pasteis">
+    <div class="group-head"><span class="group-icon">🥟</span><div><h2>PASTÉIS SALGADOS</h2><p>Grandes, crocantes e feitos na hora.</p></div></div>
+    <div class="grid" data-cat="Pastel Salgado"></div>
+    <div class="extras-box"><b>➕ Adicionais para os pastéis</b><span>Opcional: Azeitona • Palmito • Mussarela • Catupiry • Cheddar — R$ 2,00 cada.</span></div>
+  </section>
+
+  <section class="menu-group" id="doces">
+    <div class="group-head"><span class="group-icon">🍫</span><div><h2>PASTÉIS DOCES</h2><p>Uma sobremesa para fechar na vibe.</p></div></div>
+    <div class="grid" data-cat="Pastel Doce"></div>
+  </section>
+
+  <section class="menu-group" id="batatas">
+    <div class="group-head"><span class="group-icon">🍟</span><div><h2>BATATAS & ANÉIS</h2><p>Escolha seu cone ou a porção de anéis.</p></div></div>
+    <div class="subcat"><h3>Batata Palito</h3><div class="grid" data-cat="Batata Palito"></div></div>
+    <div class="subcat"><h3>Batata de Carinha</h3><div class="grid" data-cat="Batata de Carinha"></div></div>
+    <div class="subcat"><h3>Anéis de Cebola</h3><div class="grid" data-cat="Anéis de Cebola"></div><div class="notice">Acompanha maionese caseira do Food.</div></div>
+  </section>
+
+  <section class="menu-group" id="bebidas">
+    <div class="group-head"><span class="group-icon">🥤</span><div><h2>BEBIDAS</h2><p>Para completar seu pedido.</p></div></div>
+    <div class="grid" data-cat="Bebida"></div>
+  </section>
+
+  <section class="payment-card">
+    <h3>💳 Formas de pagamento</h3>
+    <div class="payment-methods"><span>PIX</span><span>Crédito</span><span>Débito</span><span>Dinheiro</span></div>
+    <div class="pix-line"><div><small>Chave PIX (CNPJ)</small><div class="pix-key">65.252.889/0001-40</div></div><button class="copy-pix" type="button" data-copy-pix>COPIAR PIX</button></div>
+  </section>
+
+  <section class="footer-card"><p>Veja novidades, horários e fotos no Instagram.</p><a class="insta" href="https://www.instagram.com/navibefood/" target="_blank" rel="noopener noreferrer">◎ SEGUIR @navibefood</a></section>
+</main>
+
+<div class="toast" id="toast">Item adicionado ✓</div>
+<div class="cartbar"><span id="cartText">🛒 0 itens • R$ 0,00</span><button class="checkout" id="openBtn">VER PEDIDO</button></div>
+
+<div class="modal" id="customModal"><div class="sheet">
+  <button class="close" id="closeCustomBtn">×</button><h2>Adicionar pastel</h2>
+  <div class="custom-product" id="customProduct"></div><div class="custom-price" id="customBasePrice"></div>
+  <div class="extra-question">Deseja adicionar algo a mais?</div><div class="extra-help">Os adicionais são opcionais.</div>
+  <div class="extra-choice-wrap"><button type="button" class="extra-choice active" id="noExtrasBtn">SEM ADICIONAIS<small>Manter como está</small></button><button type="button" class="extra-choice" id="withExtrasBtn">QUERO ADICIONAIS<small>+ R$ 2,00 cada</small></button></div>
+  <div id="extrasArea"><div><b>Escolha o que deseja acrescentar:</b></div><div id="extrasList"></div></div>
+  <div class="custom-total" id="customTotal"></div><button class="send" id="confirmCustomBtn">ADICIONAR PASTEL AO PEDIDO</button>
+</div></div>
+
+<div class="modal" id="modal"><div class="sheet">
+  <button class="close" id="closeBtn">×</button><h2>Seu pedido</h2>
+  <div id="cartItems"></div><div class="total" id="total">Total: R$ 0,00</div>
+  <label><b>Nome</b><input id="client" autocomplete="name" placeholder="Seu nome"></label>
+  <label><b>WhatsApp</b><input id="clientPhone" inputmode="tel" autocomplete="tel" placeholder="(14) 99999-9999"></label>
+  <div class="contact-note">Usamos seu número para identificar seu pedido e manter seu histórico na NA VIBE.</div>
+  <label class="consent"><input type="checkbox" id="marketingOptIn"><span>Quero receber novidades e promoções da <b>NA VIBE</b> pelo WhatsApp. <b>Opcional.</b></span></label>
+  <label><b>Forma de recebimento</b><select id="mode"><option value="retirada">Retirada no trailer</option><option value="entrega">Entrega (+ R$ 3,00)</option></select></label>
+  <div id="addressBox" style="display:none"><label><b>Endereço para entrega</b><input id="address" placeholder="Rua, número e bairro"></label></div>
+  <label><b>Forma de pagamento</b><select id="payment"><option value="pix">PIX</option><option value="credito">Cartão de crédito</option><option value="debito">Cartão de débito</option><option value="dinheiro">Dinheiro</option></select></label>
+  <div id="pixBox" class="payment-info"><p><b>Chave PIX (CNPJ)</b></p><span class="pix-key">65.252.889/0001-40</span><button class="copy-pix" type="button" data-copy-pix>COPIAR PIX</button></div>
+  <div id="changeBox" style="display:none"><label><b>Precisa de troco?</b><input id="changeFor" placeholder="Troco para quanto? Ex.: R$ 100,00"></label></div>
+  <div style="font-size:12px;color:#777;text-align:center;margin:2px 0 10px">O número do pedido é gerado automaticamente ao finalizar.</div>
+  <button class="send" id="sendBtn">ENVIAR PEDIDO PELO WHATSAPP</button>
+</div></div>
+
+<script>
+const PRODUCTS = [
+{id:0,cat:"Batata Palito",name:"Tradicional",price:22.50},
+{id:1,cat:"Batata Palito",name:"Cheddar com bacon",price:28.50},
+{id:2,cat:"Batata Palito",name:"Mussarela",price:26.50},
+{id:3,cat:"Batata Palito",name:"Mussarela com bacon",price:28.50},
+{id:4,cat:"Batata Palito",name:"Calabresa com mussarela",price:28.50},
+{id:5,cat:"Batata de Carinha",name:"Tradicional",price:28.50},
+{id:6,cat:"Batata de Carinha",name:"Cheddar com bacon",price:32.50},
+{id:7,cat:"Batata de Carinha",name:"Mussarela",price:30.50},
+{id:8,cat:"Batata de Carinha",name:"Mussarela com bacon",price:32.50},
+{id:9,cat:"Anéis de Cebola",name:"Anéis de cebola",price:27.00},
+{id:10,cat:"Pastel Salgado",name:"Carne",price:13.00},
+{id:11,cat:"Pastel Salgado",name:"Carne com queijo",price:16.00},
+{id:12,cat:"Pastel Salgado",name:"Frango com catupiry",price:14.50},
+{id:13,cat:"Pastel Salgado",name:"Calabresa com queijo",price:16.00},
+{id:14,cat:"Pastel Salgado",name:"Queijo",price:13.00},
+{id:15,cat:"Pastel Salgado",name:"Pizza",price:15.00},
+{id:16,cat:"Pastel Salgado",name:"Palmito com mussarela",price:18.00},
+{id:17,cat:"Pastel Salgado",name:"Bacon com mussarela",price:18.50},
+{id:18,cat:"Pastel Salgado",name:"Carne, mussarela e cheddar",price:18.50},
+{id:19,cat:"Pastel Salgado",name:"Frango com cheddar",price:15.00},
+{id:20,cat:"Pastel Salgado",name:"Carne seca + mussarela",price:19.00},
+{id:21,cat:"Pastel Salgado",name:"Carne seca + mussarela + catupiry",price:20.00},
+{id:22,cat:"Pastel Salgado",name:"Costela + mussarela",price:18.50,soldOut:true},
+{id:23,cat:"Pastel Salgado",name:"Costela + mussarela + catupiry",price:19.50,soldOut:true},
+{id:24,cat:"Pastel Salgado",name:"Frango com mussarela",price:15.00},
+{id:25,cat:"Pastel Salgado",name:"Bacon + calabresa + mussarela",price:16.50},
+{id:26,cat:"Pastel Doce",name:"Nutella",price:22.50,soldOut:true},
+{id:27,cat:"Pastel Doce",name:"Prestígio",price:20.00},
+{id:28,cat:"Pastel Doce",name:"Sonho de Valsa",price:20.00},
+{id:29,cat:"Pastel Doce",name:"Chocolate ao leite",price:20.00},
+{id:30,cat:"Bebida",name:"Coca-Cola lata 350 ml",price:6.00},
+{id:31,cat:"Bebida",name:"Coca-Cola Zero lata 350 ml",price:6.00},
+{id:32,cat:"Bebida",name:"Coca-Cola mini 200 ml",price:3.00},
+{id:33,cat:"Bebida",name:"Coca-Cola Zero mini 200 ml",price:3.00},
+{id:34,cat:"Bebida",name:"Coca-Cola 1 litro",price:9.00},
+{id:35,cat:"Bebida",name:"Coca-Cola Zero 1 litro",price:9.00},
+{id:36,cat:"Bebida",name:"Skol lata 350 ml",price:6.00},
+{id:37,cat:"Bebida",name:"Brahma lata 350 ml",price:6.00},
+{id:38,cat:"Bebida",name:"Água mineral 500 ml",price:3.00}
+];
+const EXTRAS=[{id:"azeitona",name:"Azeitona",price:2},{id:"palmito",name:"Palmito",price:2},{id:"mussarela",name:"Mussarela",price:2},{id:"catupiry",name:"Catupiry",price:2},{id:"cheddar",name:"Cheddar",price:2}];
+const CART={}; const WA="5514998691109"; const DELIVERY_FEE=3; const money=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+let toastTimer,customProductId=null;
+const productById=id=>PRODUCTS.find(p=>p.id===Number(id));
+const extrasByIds=ids=>ids.map(id=>EXTRAS.find(e=>e.id===id)).filter(Boolean);
+const cartKey=(productId,extraIds=[])=>productId+"|"+[...extraIds].sort().join(",");
+const cartItemUnitPrice=item=>productById(item.productId).price+extrasByIds(item.extraIds).reduce((s,e)=>s+e.price,0);
+const subtotalValue=()=>Object.values(CART).reduce((s,i)=>s+cartItemUnitPrice(i)*i.qty,0);
+const finalTotal=()=>subtotalValue()+(document.getElementById("mode").value==="entrega"?DELIVERY_FEE:0);
+const totalItems=()=>Object.values(CART).reduce((s,i)=>s+i.qty,0);
+function showToast(text="Item adicionado ✓"){const t=document.getElementById("toast");t.textContent=text;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),1400)}
+function orderName(p){if(p.cat==="Batata Palito"||p.cat==="Batata de Carinha")return `${p.cat} — ${p.name}`;if(p.cat==="Anéis de Cebola")return "Anéis de cebola";return p.name}
+
+function renderMenu(){
+ document.querySelectorAll(".grid[data-cat]").forEach(grid=>{
+  const cat=grid.dataset.cat; grid.innerHTML="";
+  PRODUCTS.filter(p=>p.cat===cat).forEach(p=>{
+   const item=document.createElement("div"); item.className="item"+(p.soldOut?" sold-out":"");
+   const note=p.soldOut?'<span class="sold-badge">ESGOTADO</span>':(p.cat==="Pastel Salgado"?"<small>Adicionais opcionais.</small>":"");
+   item.innerHTML=`<div class="item-left"><strong>${p.name}</strong>${note}</div><div class="item-right"><span class="price">${money(p.price)}</span><button class="add ${p.soldOut?"sold":""}" type="button" data-add="${p.id}" ${p.soldOut?"disabled":""}>${p.soldOut?"ESGOTADO":"ADICIONAR"}</button></div>`;
+   grid.appendChild(item);
+  });
+ });
+ document.querySelectorAll("[data-add]:not([disabled])").forEach(btn=>btn.onclick=()=>{const p=productById(btn.dataset.add);if(!p||p.soldOut)return; p.cat==="Pastel Salgado"?openCustomizer(p.id):addToCart(p.id,[])});
+}
+function setExtrasMode(use){document.getElementById("noExtrasBtn").classList.toggle("active",!use);document.getElementById("withExtrasBtn").classList.toggle("active",use);document.getElementById("extrasArea").classList.toggle("show",use);if(!use)document.querySelectorAll(".extra-check").forEach(c=>c.checked=false);updateCustomTotal()}
+function openCustomizer(id){const p=productById(id);if(!p||p.soldOut){showToast("Este sabor está esgotado");return}customProductId=Number(id);document.getElementById("customProduct").textContent=p.name;document.getElementById("customBasePrice").textContent="Valor: "+money(p.price);const list=document.getElementById("extrasList");list.innerHTML="";EXTRAS.forEach(e=>{const d=document.createElement("div");d.className="extra-option";d.innerHTML=`<label><input type="checkbox" value="${e.id}" class="extra-check"><span>${e.name}</span></label><span class="price">+ ${money(e.price)}</span>`;list.appendChild(d)});document.querySelectorAll(".extra-check").forEach(c=>c.onchange=updateCustomTotal);setExtrasMode(false);document.getElementById("customModal").classList.add("open")}
+function updateCustomTotal(){const p=productById(customProductId);if(!p)return;const sel=[...document.querySelectorAll(".extra-check:checked")].map(c=>c.value);document.getElementById("customTotal").textContent=(sel.length?"Total com adicionais: ":"Total do pastel: ")+money(p.price+extrasByIds(sel).reduce((s,e)=>s+e.price,0))}
+function addToCart(productId,extraIds=[]){const p=productById(productId);if(!p||p.soldOut){showToast("Este item está esgotado");return}const key=cartKey(productId,extraIds);if(!CART[key])CART[key]={productId:Number(productId),extraIds:[...extraIds],qty:0};CART[key].qty++;updateCartBar();showToast()}
+function changeQty(key,delta){if(!CART[key])return;CART[key].qty+=delta;if(CART[key].qty<=0)delete CART[key];updateCartBar();renderCart()}
+function updateCartBar(){document.getElementById("cartText").textContent=`🛒 ${totalItems()} itens • ${money(subtotalValue())}`}
+function renderCart(){const box=document.getElementById("cartItems");box.innerHTML="";const keys=Object.keys(CART);if(!keys.length)box.innerHTML='<p style="color:#666">Seu carrinho está vazio.</p>';else keys.forEach(key=>{const item=CART[key],p=productById(item.productId),extras=extrasByIds(item.extraIds);const row=document.createElement("div");row.className="row";row.innerHTML=`<div class="row-info"><b>${orderName(p)}</b>${extras.length?`<small>Adicionais: ${extras.map(e=>e.name).join(", ")}</small>`:""}<small>${money(cartItemUnitPrice(item))} cada</small></div><div class="qty"><button data-minus="${encodeURIComponent(key)}">−</button> <b>${item.qty}</b> <button data-plus="${encodeURIComponent(key)}">+</button></div>`;box.appendChild(row)});document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeQty(decodeURIComponent(b.dataset.minus),-1));document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeQty(decodeURIComponent(b.dataset.plus),1));document.getElementById("total").textContent="Total: "+money(finalTotal())}
+const paymentLabel=()=>({pix:"PIX",credito:"Cartão de crédito",debito:"Cartão de débito",dinheiro:"Dinheiro"})[document.getElementById("payment").value];
+const modeLabel=()=>document.getElementById("mode").value==="entrega"?"Entrega":"Retirada no trailer";
+
+document.getElementById("noExtrasBtn").onclick=()=>setExtrasMode(false);
+document.getElementById("withExtrasBtn").onclick=()=>setExtrasMode(true);
+document.getElementById("confirmCustomBtn").onclick=()=>{const use=document.getElementById("withExtrasBtn").classList.contains("active"),sel=use?[...document.querySelectorAll(".extra-check:checked")].map(c=>c.value):[];addToCart(customProductId,sel);document.getElementById("customModal").classList.remove("open")};
+document.getElementById("closeCustomBtn").onclick=()=>document.getElementById("customModal").classList.remove("open");
+document.getElementById("customModal").onclick=e=>{if(e.target.id==="customModal")e.currentTarget.classList.remove("open")};
+document.getElementById("openBtn").onclick=()=>{renderCart();document.getElementById("modal").classList.add("open")};
+document.getElementById("closeBtn").onclick=()=>document.getElementById("modal").classList.remove("open");
+document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")e.currentTarget.classList.remove("open")};
+document.getElementById("mode").onchange=()=>{document.getElementById("addressBox").style.display=document.getElementById("mode").value==="entrega"?"block":"none";renderCart()};
+document.getElementById("payment").onchange=()=>{const p=document.getElementById("payment").value;document.getElementById("pixBox").style.display=p==="pix"?"block":"none";document.getElementById("changeBox").style.display=p==="dinheiro"?"block":"none"};
+document.querySelectorAll("[data-copy-pix]").forEach(btn=>btn.onclick=async()=>{try{await navigator.clipboard.writeText("65252889000140");showToast("PIX copiado ✓")}catch(e){window.prompt("Copie a chave PIX:","65252889000140")}});
+
+const ORDER_COUNTER_URL="https://script.google.com/macros/s/AKfycbztHwzi7W9mMfVW9it7OuS35ESB11l92805P_cg5BEz7DWgQ8uIMfTr0rlQG8a9qvMZhg/exec";
+
+function getNextOrderNumber(){
+ return new Promise((resolve,reject)=>{
+   if(!ORDER_COUNTER_URL || ORDER_COUNTER_URL.includes("COLE_AQUI")){
+     reject(new Error("contador_nao_configurado"));
+     return;
+   }
+
+   const callbackName="navibeOrder_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+   const script=document.createElement("script");
+   let finished=false;
+
+   const cleanup=()=>{
+     if(finished)return;
+     finished=true;
+     try{delete window[callbackName]}catch(e){}
+     if(script.parentNode)script.parentNode.removeChild(script);
+   };
+
+   const timer=setTimeout(()=>{
+     cleanup();
+     reject(new Error("tempo_esgotado"));
+   },12000);
+
+   window[callbackName]=(data)=>{
+     clearTimeout(timer);
+     cleanup();
+     if(data && data.ok && data.number){
+       resolve(String(data.number));
+     }else{
+       reject(new Error((data&&data.error)||"erro_contador"));
+     }
+   };
+
+   script.onerror=()=>{
+     clearTimeout(timer);
+     cleanup();
+     reject(new Error("falha_rede"));
+   };
+
+   const sep=ORDER_COUNTER_URL.includes("?")?"&":"?";
+   script.src=ORDER_COUNTER_URL+sep+"action=next&callback="+encodeURIComponent(callbackName)+"&_="+Date.now();
+   document.head.appendChild(script);
+ });
+}
+function printerBold(text){return "{{BOLD_ON}}"+text+"{{BOLD_OFF}}"}
+
+async function queueOrderForPrint(number,text,clientName,clientPhone,marketingOptIn){
+ const body=new URLSearchParams();
+ body.set("action","queue");
+ body.set("number",number);
+ body.set("text",text);
+ body.set("clientName",clientName||"");
+ body.set("clientPhone",clientPhone||"");
+ body.set("marketingOptIn",marketingOptIn?"1":"0");
+
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),12000);
+
+ try{
+   await fetch(ORDER_COUNTER_URL,{
+     method:"POST",
+     mode:"no-cors",
+     body,
+     signal:controller.signal,
+     cache:"no-store"
+   });
+   return true;
+ }catch(err){
+   console.error("Falha ao enviar pedido para fila de impressão:",err);
+   return false;
+ }finally{
+   clearTimeout(timer);
+ }
+}
+
+function formatChange(value){
+ const cleaned=value.replace(/R\$/gi,"").replace(/\s/g,"").replace(/\./g,"").replace(",",".");
+ const n=Number(cleaned);
+ return Number.isFinite(n)&&cleaned!==""?money(n):(value||"não informado");
+}
+
+document.getElementById("sendBtn").onclick=async()=>{
+ const keys=Object.keys(CART);if(!keys.length){alert("Adicione pelo menos um item ao pedido.");return}
+ const client=document.getElementById("client").value.trim();if(!client){alert("Digite seu nome.");return}
+ const clientPhone=document.getElementById("clientPhone").value.trim();
+ const phoneDigits=clientPhone.replace(/\D/g,"");
+ if(phoneDigits.length!==10&&phoneDigits.length!==11){alert("Digite seu WhatsApp com DDD. Ex.: (14) 99999-9999");return}
+ const marketingOptIn=document.getElementById("marketingOptIn").checked;
+ localStorage.setItem("navibe_client_name",client);
+ localStorage.setItem("navibe_client_phone",clientPhone);
+ const delivery=document.getElementById("mode").value==="entrega",address=document.getElementById("address").value.trim();if(delivery&&!address){alert("Digite o endereço para entrega.");return}
+ const payment=document.getElementById("payment").value,changeFor=document.getElementById("changeFor").value.trim();
+
+ const sendBtn=document.getElementById("sendBtn");
+ const oldButtonText=sendBtn.textContent;
+ sendBtn.disabled=true;
+ sendBtn.textContent="GERANDO Nº DO PEDIDO...";
+
+ let orderNumber;
+ try{
+   orderNumber=await getNextOrderNumber();
+ }catch(err){
+   sendBtn.disabled=false;
+   sendBtn.textContent=oldButtonText;
+   alert("Não consegui gerar o número do pedido. Tente novamente em alguns segundos.");
+   return;
+ }
+
+ const lines=[];
+ lines.push(printerBold("PEDIDO Nº "+orderNumber));
+ lines.push("");
+ lines.push(printerBold("CLIENTE:")+" "+client);
+ lines.push(printerBold("RECEBIMENTO:")+" "+modeLabel());
+
+ if(delivery){
+   lines.push(printerBold("ENDEREÇO:"));
+   lines.push(address);
+ }
+
+ lines.push(printerBold("PAGAMENTO:")+" "+paymentLabel());
+
+ if(payment==="pix"){
+   lines.push(printerBold("PIX:")+" 65.252.889/0001-40");
+ }
+
+ if(payment==="dinheiro"){
+   lines.push(printerBold("TROCO PARA:")+" "+formatChange(changeFor));
+ }
+
+ lines.push("");
+ lines.push("------------------------------");
+ lines.push(printerBold("ITENS"));
+ lines.push("------------------------------");
+
+ keys.forEach(key=>{
+   const item=CART[key],p=productById(item.productId),extras=extrasByIds(item.extraIds);
+   lines.push(item.qty+"x "+orderName(p));
+   if(extras.length) lines.push("   + "+extras.map(e=>e.name).join(", "));
+   lines.push("   "+money(cartItemUnitPrice(item)*item.qty));
+   lines.push("");
+ });
+
+ lines.push("------------------------------");
+ lines.push("Subtotal: "+money(subtotalValue()));
+ if(delivery) lines.push("Entrega:  "+money(DELIVERY_FEE));
+ lines.push(printerBold("TOTAL: "+money(finalTotal())));
+ lines.push("------------------------------");
+
+ const printText=lines.join("\n");
+
+ sendBtn.textContent="ENVIANDO PARA IMPRESSORA...";
+ const queued=await queueOrderForPrint(orderNumber,printText,client,clientPhone,marketingOptIn);
+
+ if(!queued){
+   sendBtn.disabled=false;
+   sendBtn.textContent=oldButtonText;
+   alert("O pedido foi numerado, mas não consegui enviá-lo para a fila de impressão. Verifique a internet e tente finalizar novamente.");
+   return;
+ }
+
+ const whatsappText=printText
+   .replaceAll("{{BOLD_ON}}","*")
+   .replaceAll("{{BOLD_OFF}}","*");
+
+ const msg=encodeURIComponent(whatsappText);
+ sendBtn.textContent="ABRINDO WHATSAPP...";
+ window.location.href="https://wa.me/"+WA+"?text="+msg;
+};
+
+try{
+ const savedName=localStorage.getItem("navibe_client_name")||"";
+ const savedPhone=localStorage.getItem("navibe_client_phone")||"";
+ if(savedName)document.getElementById("client").value=savedName;
+ if(savedPhone)document.getElementById("clientPhone").value=savedPhone;
+}catch(e){}
+renderMenu();updateCartBar();
+</script>
+</body>
+</html>
