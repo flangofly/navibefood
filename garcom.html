@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Na Vibe — Garçom</title>
+<style>
+:root{--green:#79d51a;--green2:#64bd11;--black:#111;--paper:#f4f4f1;--line:#e8e8e3;--muted:#707070;--danger:#c62828}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:#111;font-family:Arial,Helvetica,sans-serif;padding-bottom:92px}
+button,input,textarea{font:inherit}
+header{background:#111;color:#fff;padding:15px 14px;position:sticky;top:0;z-index:20;box-shadow:0 3px 14px #0003}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:760px;margin:auto}
+.logo{font-size:28px;font-weight:900;font-style:italic} .logo b{color:var(--green)}
+.badge{font-size:12px;font-weight:900;background:#ffffff14;border:1px solid #ffffff22;border-radius:999px;padding:7px 10px}
+.wrap{max-width:760px;margin:auto;padding:12px}
+.screen{display:none} .screen.active{display:block}
+.card{background:#fff;border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 3px 15px #0000000b}
+h1{font-size:25px;margin:0 0 6px} .muted{color:#777;font-size:14px;line-height:1.4}
+.table-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+.table-btn{border:2px solid #e2e2dc;background:#fff;border-radius:18px;padding:24px 10px;font-weight:900;font-size:22px;cursor:pointer;box-shadow:0 3px 11px #00000009}
+.table-btn:active{transform:scale(.98)} .table-btn span{display:block;font-size:12px;color:#777;margin-top:5px}
+.waiter-box{margin-top:14px} input,textarea{width:100%;border:1px solid #ddd;background:#fff;border-radius:12px;padding:13px;margin-top:6px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.current-table{font-size:22px;font-weight:900} .change-table{border:0;background:#eee;border-radius:10px;padding:9px 11px;font-weight:900}
+.catbar{display:flex;gap:8px;overflow:auto;scrollbar-width:none;padding:4px 0 10px;position:sticky;top:68px;background:var(--paper);z-index:9}
+.catbar::-webkit-scrollbar{display:none}
+.catbtn{white-space:nowrap;border:1px solid #ddd;background:#fff;border-radius:999px;padding:10px 12px;font-weight:900;cursor:pointer}
+.catbtn.active{background:#111;color:#fff;border-color:#111}
+.products{display:grid;gap:9px}
+.product{background:#fff;border:1px solid #e9e9e4;border-radius:15px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.product.sold{opacity:.55;background:#f0f0f0}
+.pname{font-weight:900;line-height:1.25} .pprice{font-size:13px;color:#777;margin-top:4px}
+.add{border:0;background:var(--green);border-radius:11px;padding:11px 13px;font-weight:900;min-width:92px;cursor:pointer}
+.add:disabled{background:#ccc;color:#777}
+.cartbar{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);width:calc(100% - 20px);max-width:740px;background:#111;color:#fff;border-radius:17px;padding:10px 12px;display:none;align-items:center;justify-content:space-between;gap:10px;z-index:30;box-shadow:0 8px 30px #0006}
+.cartbar.show{display:flex} .carttext{font-weight:900;font-size:14px} .review{border:0;background:var(--green);border-radius:11px;padding:11px 13px;font-weight:900}
+.modal{display:none;position:fixed;inset:0;background:#000a;z-index:40;padding:10px;align-items:flex-end;justify-content:center}
+.modal.open{display:flex} .sheet{background:#fff;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:22px 22px 16px 16px;padding:16px}
+.close{float:right;border:0;background:#eee;border-radius:50%;width:36px;height:36px;font-size:20px}
+.row{padding:11px 0;border-bottom:1px solid #eee;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.row small{display:block;color:#777;margin-top:3px} .qty{white-space:nowrap} .qty button{border:0;border-radius:8px;width:32px;height:32px;font-weight:900}
+.total{font-size:20px;font-weight:900;text-align:right;margin:14px 0}
+.send{width:100%;border:0;background:var(--green);border-radius:12px;padding:15px;font-weight:900;font-size:17px;margin-top:10px}
+.success{display:none;position:fixed;inset:0;background:#111;z-index:100;color:#fff;align-items:center;justify-content:center;padding:20px;text-align:center}
+.success.show{display:flex} .success-box{max-width:420px} .check{font-size:58px} .success h2{font-size:30px;margin:10px 0} .success p{color:#ccc;line-height:1.5}
+.success button{margin-top:18px;border:0;background:var(--green);border-radius:12px;padding:13px 18px;font-weight:900}
+.extra-list{display:grid;gap:8px;margin:12px 0} .extra{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #e5e5df;border-radius:12px;padding:11px}
+.extra label{display:flex;gap:10px;align-items:center;font-weight:800} .extra input{width:auto;margin:0;transform:scale(1.2)}
+@media(min-width:620px){.table-grid{grid-template-columns:repeat(5,1fr)}}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Na Vibe Garçom">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+</head>
+<body data-app-version="2.0">
+<header>
+  <div class="brand"><div class="logo"><b>NA</b> VIBE</div><div class="badge">PAINEL DO GARÇOM</div></div>
+</header>
+
+<main class="wrap">
+  <section id="mesaScreen" class="screen active">
+    <div class="card">
+      <h1>Qual mesa?</h1>
+      <div class="muted">Escolha a mesa primeiro. Depois é só marcar os itens e enviar.</div>
+      <div class="table-grid" id="tableGrid"></div>
+      <div class="waiter-box">
+        <label><b>Nome do garçom</b><input id="waiterName" placeholder="Ex.: João" autocomplete="name"></label>
+      </div>
+    </div>
+  </section>
+
+  <section id="menuScreen" class="screen">
+    <div class="card">
+      <div class="topline">
+        <div><div class="muted">Pedido para</div><div class="current-table" id="currentTable">MESA 1</div></div>
+        <button class="change-table" id="changeTableBtn">TROCAR MESA</button>
+      </div>
+    </div>
+    <div class="catbar" id="catbar"></div>
+    <div class="products" id="products"></div>
+  </section>
+</main>
+
+<div class="cartbar" id="cartbar">
+  <div class="carttext" id="cartText">0 itens • R$ 0,00</div>
+  <button class="review" id="reviewBtn">VER PEDIDO</button>
+</div>
+
+<div class="modal" id="reviewModal">
+  <div class="sheet">
+    <button class="close" id="closeReview">×</button>
+    <h2>Conferir pedido</h2>
+    <div><b id="reviewTable">MESA 1</b></div>
+    <div id="cartRows"></div>
+    <div class="total" id="totalBox">Total: R$ 0,00</div>
+    <label><b>Observação do pedido</b>
+      <textarea id="orderNote" rows="3" placeholder="Ex.: 1 pastel sem cebola, levar guardanapo..."></textarea>
+    </label>
+    <button class="send" id="sendOrderBtn">ENVIAR PARA A IMPRESSORA</button>
+  </div>
+</div>
+
+<div class="modal" id="extrasModal">
+  <div class="sheet">
+    <button class="close" id="closeExtras">×</button>
+    <h2>Adicionais do pastel</h2>
+    <div id="extraProductName" style="font-weight:900;font-size:18px"></div>
+    <div class="extra-list" id="extraList"></div>
+    <button class="send" id="confirmExtras">ADICIONAR AO PEDIDO</button>
+  </div>
+</div>
+
+<div class="success" id="success">
+  <div class="success-box">
+    <div class="check">✓</div>
+    <h2 id="successTitle">Pedido enviado!</h2>
+    <p id="successText">O pedido já foi enviado para a fila de impressão.</p>
+    <button id="newOrderBtn">NOVO PEDIDO</button>
+  </div>
+</div>
+
+<script>
+const ORDER_URL="https://script.google.com/macros/s/AKfycbztHwzi7W9mMfVW9it7OuS35ESB11l92805P_cg5BEz7DWgQ8uIMfTr0rlQG8a9qvMZhg/exec";
+const PRODUCTS=[{"id": 0, "cat": "Batata Palito", "name": "Tradicional", "price": 22.5}, {"id": 1, "cat": "Batata Palito", "name": "Cheddar com bacon", "price": 28.5}, {"id": 2, "cat": "Batata Palito", "name": "Mussarela", "price": 26.5}, {"id": 3, "cat": "Batata Palito", "name": "Mussarela com bacon", "price": 28.5}, {"id": 4, "cat": "Batata Palito", "name": "Calabresa com mussarela", "price": 28.5}, {"id": 5, "cat": "Batata de Carinha", "name": "Tradicional", "price": 28.5}, {"id": 6, "cat": "Batata de Carinha", "name": "Cheddar com bacon", "price": 32.5}, {"id": 7, "cat": "Batata de Carinha", "name": "Mussarela", "price": 30.5}, {"id": 8, "cat": "Batata de Carinha", "name": "Mussarela com bacon", "price": 32.5}, {"id": 9, "cat": "Anéis de Cebola", "name": "Anéis de cebola", "price": 27.0}, {"id": 10, "cat": "Pastel Salgado", "name": "Carne", "price": 13.0}, {"id": 11, "cat": "Pastel Salgado", "name": "Carne com queijo", "price": 16.0}, {"id": 12, "cat": "Pastel Salgado", "name": "Frango com catupiry", "price": 14.5}, {"id": 13, "cat": "Pastel Salgado", "name": "Calabresa com queijo", "price": 16.0}, {"id": 14, "cat": "Pastel Salgado", "name": "Queijo", "price": 13.0}, {"id": 15, "cat": "Pastel Salgado", "name": "Pizza", "price": 15.0}, {"id": 16, "cat": "Pastel Salgado", "name": "Palmito com mussarela", "price": 18.0}, {"id": 17, "cat": "Pastel Salgado", "name": "Bacon com mussarela", "price": 18.5}, {"id": 18, "cat": "Pastel Salgado", "name": "Carne, mussarela e cheddar", "price": 18.5}, {"id": 19, "cat": "Pastel Salgado", "name": "Frango com cheddar", "price": 15.0}, {"id": 20, "cat": "Pastel Salgado", "name": "Carne seca + mussarela", "price": 19.0}, {"id": 21, "cat": "Pastel Salgado", "name": "Carne seca + mussarela + catupiry", "price": 20.0}, {"id": 22, "cat": "Pastel Salgado", "name": "Costela + mussarela", "price": 18.5, "soldOut": true}, {"id": 23, "cat": "Pastel Salgado", "name": "Costela + mussarela + catupiry", "price": 19.5, "soldOut": true}, {"id": 24, "cat": "Pastel Salgado", "name": "Frango com mussarela", "price": 15.0}, {"id": 25, "cat": "Pastel Salgado", "name": "Bacon + calabresa + mussarela", "price": 16.5}, {"id": 26, "cat": "Pastel Doce", "name": "Nutella", "price": 22.5, "soldOut": true}, {"id": 27, "cat": "Pastel Doce", "name": "Prestígio", "price": 20.0}, {"id": 28, "cat": "Pastel Doce", "name": "Sonho de Valsa", "price": 20.0}, {"id": 29, "cat": "Pastel Doce", "name": "Chocolate ao leite", "price": 20.0}, {"id": 30, "cat": "Bebida", "name": "Coca-Cola lata 350 ml", "price": 6.0}, {"id": 31, "cat": "Bebida", "name": "Coca-Cola Zero lata 350 ml", "price": 6.0}, {"id": 32, "cat": "Bebida", "name": "Coca-Cola mini 200 ml", "price": 3.0}, {"id": 33, "cat": "Bebida", "name": "Coca-Cola Zero mini 200 ml", "price": 3.0}, {"id": 34, "cat": "Bebida", "name": "Coca-Cola 1 litro", "price": 9.0}, {"id": 35, "cat": "Bebida", "name": "Coca-Cola Zero 1 litro", "price": 9.0}, {"id": 36, "cat": "Bebida", "name": "Skol lata 350 ml", "price": 6.0}, {"id": 37, "cat": "Bebida", "name": "Brahma lata 350 ml", "price": 6.0}, {"id": 38, "cat": "Bebida", "name": "Água mineral 500 ml", "price": 3.0}];
+const EXTRAS=[{"id": "azeitona", "name": "Azeitona", "price": 2}, {"id": "palmito", "name": "Palmito", "price": 2}, {"id": "mussarela", "name": "Mussarela", "price": 2}, {"id": "catupiry", "name": "Catupiry", "price": 2}, {"id": "cheddar", "name": "Cheddar", "price": 2}];
+const TABLES=[1,2,3,4,5];
+
+let selectedTable=null;
+let activeCat="Pastel Salgado";
+let extrasProductId=null;
+const CART={};
+
+const money=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const productById=id=>PRODUCTS.find(p=>p.id===Number(id));
+const extraByIds=ids=>ids.map(id=>EXTRAS.find(e=>e.id===id)).filter(Boolean);
+const cartKey=(id,extras=[])=>id+"|"+[...extras].sort().join(",");
+const unitPrice=item=>productById(item.productId).price+extraByIds(item.extraIds).reduce((s,e)=>s+e.price,0);
+const totalItems=()=>Object.values(CART).reduce((s,i)=>s+i.qty,0);
+const totalValue=()=>Object.values(CART).reduce((s,i)=>s+(unitPrice(i)*i.qty),0);
+
+function itemName(p){
+  if(p.cat==="Batata Palito"||p.cat==="Batata de Carinha") return p.cat+" — "+p.name;
+  return p.name;
+}
+
+function renderTables(){
+  const g=document.getElementById("tableGrid");
+  g.innerHTML="";
+  TABLES.forEach(n=>{
+    const b=document.createElement("button");
+    b.className="table-btn";
+    b.innerHTML="MESA "+n+"<span>TOCAR PARA ABRIR</span>";
+    b.onclick=()=>selectTable(n);
+    g.appendChild(b);
+  });
+}
+
+function selectTable(n){
+  const waiter=document.getElementById("waiterName").value.trim();
+  if(waiter) localStorage.setItem("navibe_waiter",waiter);
+  selectedTable=n;
+  document.getElementById("currentTable").textContent="MESA "+n;
+  document.getElementById("mesaScreen").classList.remove("active");
+  document.getElementById("menuScreen").classList.add("active");
+  renderCategories();
+  renderProducts();
+  updateCart();
+  window.scrollTo(0,0);
+}
+
+function renderCategories(){
+  const cats=["Pastel Salgado","Pastel Doce","Batata Palito","Batata de Carinha","Anéis de Cebola","Bebida"];
+  const names={"Pastel Salgado":"PASTÉIS","Pastel Doce":"DOCES","Batata Palito":"BATATA PALITO","Batata de Carinha":"CARINHAS","Anéis de Cebola":"ANÉIS","Bebida":"BEBIDAS"};
+  const bar=document.getElementById("catbar");
+  bar.innerHTML="";
+  cats.forEach(cat=>{
+    const b=document.createElement("button");
+    b.className="catbtn"+(activeCat===cat?" active":"");
+    b.textContent=names[cat];
+    b.onclick=()=>{activeCat=cat;renderCategories();renderProducts();};
+    bar.appendChild(b);
+  });
+}
+
+function renderProducts(){
+  const box=document.getElementById("products");
+  box.innerHTML="";
+  PRODUCTS.filter(p=>p.cat===activeCat).forEach(p=>{
+    const d=document.createElement("div");
+    d.className="product"+(p.soldOut?" sold":"");
+    d.innerHTML=`<div><div class="pname">${p.name}</div><div class="pprice">${p.soldOut?"ESGOTADO":money(p.price)}</div></div>
+      <button class="add" ${p.soldOut?"disabled":""}>${p.soldOut?"ESGOTADO":"ADICIONAR"}</button>`;
+    d.querySelector("button").onclick=()=>{
+      if(p.soldOut)return;
+      if(p.cat==="Pastel Salgado") openExtras(p.id);
+      else addToCart(p.id,[]);
+    };
+    box.appendChild(d);
+  });
+}
+
+function openExtras(id){
+  extrasProductId=id;
+  const p=productById(id);
+  document.getElementById("extraProductName").textContent=p.name+" — "+money(p.price);
+  const list=document.getElementById("extraList");
+  list.innerHTML="";
+  EXTRAS.forEach(e=>{
+    const row=document.createElement("div");
+    row.className="extra";
+    row.innerHTML=`<label><input type="checkbox" class="extraCheck" value="${e.id}"> ${e.name}</label><b>+ ${money(e.price)}</b>`;
+    list.appendChild(row);
+  });
+  document.getElementById("extrasModal").classList.add("open");
+}
+
+function addToCart(id,extras){
+  const key=cartKey(id,extras);
+  if(!CART[key]) CART[key]={productId:Number(id),extraIds:[...extras],qty:0};
+  CART[key].qty++;
+  updateCart();
+}
+
+function updateCart(){
+  const n=totalItems();
+  document.getElementById("cartText").textContent=n+" itens • "+money(totalValue());
+  document.getElementById("cartbar").classList.toggle("show",selectedTable!==null);
+}
+
+function changeQty(key,delta){
+  if(!CART[key])return;
+  CART[key].qty+=delta;
+  if(CART[key].qty<=0) delete CART[key];
+  updateCart();
+  renderReview();
+}
+
+function renderReview(){
+  document.getElementById("reviewTable").textContent="MESA "+selectedTable;
+  const box=document.getElementById("cartRows");
+  box.innerHTML="";
+  const keys=Object.keys(CART);
+  if(!keys.length){
+    box.innerHTML='<p class="muted">Nenhum item no pedido.</p>';
+  } else {
+    keys.forEach(key=>{
+      const item=CART[key],p=productById(item.productId),extras=extraByIds(item.extraIds);
+      const row=document.createElement("div");
+      row.className="row";
+      row.innerHTML=`<div><b>${itemName(p)}</b>${extras.length?`<small>+ ${extras.map(e=>e.name).join(", ")}</small>`:""}<small>${money(unitPrice(item))} cada</small></div>
+        <div class="qty"><button data-minus="${encodeURIComponent(key)}">−</button> <b>${item.qty}</b> <button data-plus="${encodeURIComponent(key)}">+</button></div>`;
+      box.appendChild(row);
+    });
+    box.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeQty(decodeURIComponent(b.dataset.minus),-1));
+    box.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeQty(decodeURIComponent(b.dataset.plus),1));
+  }
+  document.getElementById("totalBox").textContent="Total: "+money(totalValue());
+}
+
+function getNextOrderNumber(){
+ return new Promise((resolve,reject)=>{
+   const cb="navibeGarcom_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+   const s=document.createElement("script");
+   let done=false;
+   const cleanup=()=>{if(done)return;done=true;try{delete window[cb]}catch(e){};if(s.parentNode)s.parentNode.removeChild(s);};
+   const timer=setTimeout(()=>{cleanup();reject(new Error("tempo_esgotado"));},12000);
+   window[cb]=data=>{clearTimeout(timer);cleanup();if(data&&data.ok&&data.number)resolve(String(data.number));else reject(new Error((data&&data.error)||"erro_contador"));};
+   s.onerror=()=>{clearTimeout(timer);cleanup();reject(new Error("falha_rede"));};
+   s.src=ORDER_URL+"?action=next&callback="+encodeURIComponent(cb)+"&_="+Date.now();
+   document.head.appendChild(s);
+ });
+}
+
+function postOrderWithHiddenForm(number,text){
+  return new Promise((resolve,reject)=>{
+    const iframeName="navibe_queue_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+
+    const iframe=document.createElement("iframe");
+    iframe.name=iframeName;
+    iframe.style.display="none";
+
+    const form=document.createElement("form");
+    form.method="POST";
+    form.action=ORDER_URL;
+    form.target=iframeName;
+    form.style.display="none";
+
+    const add=(name,value)=>{
+      const input=document.createElement("input");
+      input.type="hidden";
+      input.name=name;
+      input.value=value;
+      form.appendChild(input);
+    };
+
+    add("action","queue");
+    add("number",number);
+    add("text",text);
+
+    let finished=false;
+    const cleanup=()=>{
+      if(finished)return;
+      finished=true;
+      setTimeout(()=>{
+        try{iframe.remove()}catch(e){}
+        try{form.remove()}catch(e){}
+      },800);
+    };
+
+    const timer=setTimeout(()=>{
+      cleanup();
+      resolve(true);
+    },1800);
+
+    iframe.onload=()=>{
+      clearTimeout(timer);
+      cleanup();
+      resolve(true);
+    };
+
+    iframe.onerror=()=>{
+      clearTimeout(timer);
+      cleanup();
+      reject(new Error("falha_formulario"));
+    };
+
+    document.body.appendChild(iframe);
+    document.body.appendChild(form);
+
+    try{
+      form.submit();
+    }catch(err){
+      clearTimeout(timer);
+      cleanup();
+      reject(err);
+    }
+  });
+}
+
+async function queueOrder(number,text){
+  const body=new URLSearchParams();
+  body.set("action","queue");
+  body.set("number",number);
+  body.set("text",text);
+
+  try{
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),7000);
+
+    try{
+      await fetch(ORDER_URL,{
+        method:"POST",
+        mode:"no-cors",
+        body,
+        cache:"no-store",
+        signal:controller.signal
+      });
+      return true;
+    }finally{
+      clearTimeout(timer);
+    }
+  }catch(err){
+    console.warn("Fetch bloqueado/falhou. Tentando envio alternativo...",err);
+    return await postOrderWithHiddenForm(number,text);
+  }
+}
+
+function buildPrintText(number){
+  const waiter=(localStorage.getItem("navibe_waiter")||document.getElementById("waiterName").value.trim()||"Garçom");
+  const note=document.getElementById("orderNote").value.trim();
+  const lines=[];
+  lines.push("{{BOLD_ON}}PEDIDO Nº "+number+"{{BOLD_OFF}}");
+  lines.push("");
+  lines.push("{{BOLD_ON}}MESA: "+selectedTable+"{{BOLD_OFF}}");
+  lines.push("GARÇOM: "+waiter);
+  lines.push("");
+  lines.push("------------------------------");
+  lines.push("{{BOLD_ON}}ITENS{{BOLD_OFF}}");
+  lines.push("------------------------------");
+  Object.keys(CART).forEach(key=>{
+    const item=CART[key],p=productById(item.productId),extras=extraByIds(item.extraIds);
+    lines.push(item.qty+"x "+itemName(p));
+    if(extras.length) lines.push("   + "+extras.map(e=>e.name).join(", "));
+    lines.push("   "+money(unitPrice(item)*item.qty));
+    lines.push("");
+  });
+  lines.push("------------------------------");
+  lines.push("{{BOLD_ON}}TOTAL: "+money(totalValue())+"{{BOLD_OFF}}");
+  if(note){
+    lines.push("------------------------------");
+    lines.push("{{BOLD_ON}}OBSERVAÇÃO:{{BOLD_OFF}}");
+    lines.push(note);
+  }
+  lines.push("------------------------------");
+  return lines.join("\n");
+}
+
+function resetOrder(){
+  Object.keys(CART).forEach(k=>delete CART[k]);
+  selectedTable=null;
+  document.getElementById("orderNote").value="";
+  document.getElementById("menuScreen").classList.remove("active");
+  document.getElementById("mesaScreen").classList.add("active");
+  document.getElementById("cartbar").classList.remove("show");
+  updateCart();
+  window.scrollTo(0,0);
+}
+
+document.getElementById("changeTableBtn").onclick=()=>{
+  document.getElementById("menuScreen").classList.remove("active");
+  document.getElementById("mesaScreen").classList.add("active");
+  document.getElementById("cartbar").classList.remove("show");
+  window.scrollTo(0,0);
+};
+document.getElementById("reviewBtn").onclick=()=>{
+  renderReview();
+  document.getElementById("reviewModal").classList.add("open");
+};
+document.getElementById("closeReview").onclick=()=>document.getElementById("reviewModal").classList.remove("open");
+document.getElementById("reviewModal").onclick=e=>{if(e.target.id==="reviewModal")e.currentTarget.classList.remove("open");};
+document.getElementById("closeExtras").onclick=()=>document.getElementById("extrasModal").classList.remove("open");
+document.getElementById("extrasModal").onclick=e=>{if(e.target.id==="extrasModal")e.currentTarget.classList.remove("open");};
+document.getElementById("confirmExtras").onclick=()=>{
+  const selected=[...document.querySelectorAll(".extraCheck:checked")].map(c=>c.value);
+  addToCart(extrasProductId,selected);
+  document.getElementById("extrasModal").classList.remove("open");
+};
+document.getElementById("sendOrderBtn").onclick=async()=>{
+  if(!Object.keys(CART).length){alert("Adicione pelo menos um item.");return;}
+
+  const btn=document.getElementById("sendOrderBtn");
+  const old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent="GERANDO PEDIDO...";
+
+  let number="";
+
+  try{
+    try{
+      number=await getNextOrderNumber();
+    }catch(err){
+      console.error("Erro ao gerar número:",err);
+      throw new Error("numero");
+    }
+
+    const text=buildPrintText(number);
+
+    btn.textContent="ENVIANDO PARA IMPRESSÃO...";
+
+    try{
+      await queueOrder(number,text);
+    }catch(err){
+      console.error("Erro ao enviar para fila:",err);
+      throw new Error("fila");
+    }
+
+    document.getElementById("reviewModal").classList.remove("open");
+    document.getElementById("successTitle").textContent="Pedido #"+number+" enviado!";
+    document.getElementById("successText").textContent="Mesa "+selectedTable+" • pedido enviado para a impressão.";
+    document.getElementById("success").classList.add("show");
+
+  }catch(err){
+    if(err && err.message==="numero"){
+      alert("Não consegui gerar o número do pedido. Verifique se o celular está com internet e tente novamente.");
+    }else{
+      alert("Não consegui mandar o pedido para a fila de impressão. Tente novamente em alguns segundos.");
+    }
+  }finally{
+    btn.disabled=false;
+    btn.textContent=old;
+  }
+};
+document.getElementById("newOrderBtn").onclick=()=>{
+  document.getElementById("success").classList.remove("show");
+  resetOrder();
+};
+
+const savedWaiter=localStorage.getItem("navibe_waiter");
+if(savedWaiter) document.getElementById("waiterName").value=savedWaiter;
+renderTables();
+updateCart();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(err => console.log("SW erro:", err));
+  });
+}
+</script>
+
+</body>
+</html>
